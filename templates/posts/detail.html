@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ post.title }} – Joan Bono{% endblock %}
+
+{% block content %}
+<div class="post-detail">
+    <header class="post-detail-header">
+        <a href="{% url 'post_list' %}" class="back-link">← Volver al blog</a>
+        <h1>{{ post.title }}</h1>
+        <small class="post-date">{{ post.created_at|date:"d M Y" }}</small>
+    </header>
+
+    <article class="post-content">
+        {{ post.content|safe }}
+    </article>
+</div>
+{% endblock %}

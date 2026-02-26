@@ -1,0 +1,27 @@
+{% extends "admin/base_site.html" %}
+
+{% block extrahead %}
+{{ block.super }}
+<script>
+(function() {
+    var dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    var skin = dark ? 'oxide-dark' : 'oxide';
+    var contentCss = dark ? 'dark' : 'default';
+
+    var _originalInit;
+    function patchTinyMCE() {
+        if (window.tinymce) {
+            _originalInit = window.tinymce.init.bind(window.tinymce);
+            window.tinymce.init = function(settings) {
+                settings.skin = skin;
+                settings.content_css = contentCss;
+                return _originalInit(settings);
+            };
+        } else {
+            setTimeout(patchTinyMCE, 50);
+        }
+    }
+    patchTinyMCE();
+})();
+</script>
+{% endblock %}
