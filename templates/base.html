@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Blog – Joan Bono{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <nav>
+                <ul>
+                    <li><a href="/" class="site-title">Joan Bono <span class="blog-badge">Blog</span></a></li>
+                </ul>
+                <ul>
+                    <li>
+                        <button class="theme-toggle contrast outline" id="themeToggle" aria-label="Cambiar tema">
+                            <span id="themeIcon">☀️</span>
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-tech">
+                <span class="tech-tag">Django</span>
+                <span class="tech-tag">Python</span>
+                <span class="tech-tag">Pico CSS</span>
+                <span class="tech-tag">SQLite / PostgreSQL</span>
+                <span class="tech-tag">Docker</span>
+            </div>
+            <small>© 2026 Joan Bono · <a href="https://joanbonoprog.es" target="_blank">Portfolio</a></small>
+        </div>
+    </footer>
+
+    <script>
+        (function () {
+            const html = document.documentElement;
+            const btn = document.getElementById('themeToggle');
+            const icon = document.getElementById('themeIcon');
+
+            const saved = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = saved || (prefersDark ? 'dark' : 'light');
+
+            html.setAttribute('data-theme', theme);
+            icon.textContent = theme === 'dark' ? '☀️' : '🌙';
+
+            btn.addEventListener('click', function () {
+                const current = html.getAttribute('data-theme');
+                const next = current === 'dark' ? 'light' : 'dark';
+                html.setAttribute('data-theme', next);
+                icon.textContent = next === 'dark' ? '☀️' : '🌙';
+                localStorage.setItem('theme', next);
+            });
+        })();
+    </script>
+</body>
+</html>

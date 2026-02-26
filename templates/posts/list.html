@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Blog – Joan Bono{% endblock %}
+
+{% block content %}
+<div class="posts-header">
+    <h1>Blog</h1>
+    <p class="posts-subtitle">Artículos sobre desarrollo, tecnología y más.</p>
+</div>
+
+{% if posts %}
+    <div class="posts-list">
+        {% for post in posts %}
+        <article class="post-card">
+            <header>
+                <h2><a href="{% url 'post_detail' post.slug %}">{{ post.title }}</a></h2>
+                <small class="post-date">{{ post.created_at|date:"d M Y" }}</small>
+            </header>
+            {% if post.excerpt %}
+                <p class="post-excerpt">{{ post.excerpt }}</p>
+            {% endif %}
+            <footer>
+                <a href="{% url 'post_detail' post.slug %}" class="read-more">Leer más →</a>
+            </footer>
+        </article>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="empty-state">
+        <p>No hay posts publicados todavía.</p>
+    </div>
+{% endif %}
+{% endblock %}
