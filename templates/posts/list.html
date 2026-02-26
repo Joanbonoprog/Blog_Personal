@@ -9,20 +9,18 @@
 </div>
 
 {% if posts %}
-    <div class="posts-list">
+    <div class="posts-grid">
         {% for post in posts %}
-        <article class="post-card">
-            <header>
-                <h2><a href="{% url 'post_detail' post.slug %}">{{ post.title }}</a></h2>
+        <a href="{% url 'post_detail' post.slug %}" class="post-card">
+            <div class="post-card-inner">
                 <small class="post-date">{{ post.created_at|date:"d M Y" }}</small>
-            </header>
-            {% if post.excerpt %}
-                <p class="post-excerpt">{{ post.excerpt }}</p>
-            {% endif %}
-            <footer>
-                <a href="{% url 'post_detail' post.slug %}" class="read-more">Leer más →</a>
-            </footer>
-        </article>
+                <h2>{{ post.title }}</h2>
+                {% if post.excerpt %}
+                    <p class="post-excerpt">{{ post.excerpt }}</p>
+                {% endif %}
+            </div>
+            <span class="post-card-arrow">→</span>
+        </a>
         {% endfor %}
     </div>
 {% else %}
