@@ -3,9 +3,41 @@
 {% block title %}Blog – Joan Bono{% endblock %}
 
 {% block content %}
-<div class="posts-header">
-    <h1>Blog</h1>
-    <p class="posts-subtitle">Artículos sobre desarrollo, tecnología y más.</p>
+<div style="display:flex;flex-direction:row;align-items:flex-end;justify-content:flex-start;gap:1.5rem;margin-bottom:1.75rem;">
+    <div style="display:flex;flex-direction:column;gap:0.3rem;flex:1;max-width:300px;">
+        <span class="toolbar-label">Filtrar por tema</span>
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+            <select style="width:100%;margin-bottom:0;" onchange="const p=new URLSearchParams(window.location.search);p.set('tag',this.value);window.location.search=p.toString()">
+                <option value="">Todos los temas</option>
+                {% for tag in all_tags %}
+                <option value="{{ tag.slug }}" {% if active_tag == tag.slug %}selected{% endif %}>{{ tag.name }}</option>
+                {% endfor %}
+            </select>
+            {% if active_tag %}
+            <span onclick="window.location.href='?order={{ order }}'" class="toolbar-reset" title="Quitar filtro"
+                style="display:inline-flex;align-items:center;justify-content:center;width:46px;height:46px;border-radius:6px;border:1px solid var(--pico-muted-border-color);background:transparent;color:var(--pico-muted-color);font-size:1rem;cursor:pointer;flex-shrink:0;"
+                onmouseenter="this.style.border='1px solid #ef4444';this.style.color='#ef4444';this.style.background='rgba(239,68,68,0.08)';"
+                onmouseleave="this.style.border='1px solid var(--pico-muted-border-color)';this.style.color='var(--pico-muted-color)';this.style.background='transparent';">✕</span>
+            {% endif %}
+        </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:0.3rem;flex:1;max-width:300px;">
+        <span class="toolbar-label">Ordenar por</span>
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+            <select style="width:100%;margin-bottom:0;" onchange="const p=new URLSearchParams(window.location.search);p.set('order',this.value);window.location.search=p.toString()">
+                <option value="newest" {% if order == 'newest' %}selected{% endif %}>Más recientes</option>
+                <option value="oldest" {% if order == 'oldest' %}selected{% endif %}>Más antiguos</option>
+                <option value="az" {% if order == 'az' %}selected{% endif %}>A → Z</option>
+                <option value="za" {% if order == 'za' %}selected{% endif %}>Z → A</option>
+            </select>
+            {% if order != 'newest' %}
+            <span onclick="window.location.href='?{% if active_tag %}tag={{ active_tag }}{% endif %}'" class="toolbar-reset" title="Restablecer orden"
+                style="display:inline-flex;align-items:center;justify-content:center;width:46px;height:46px;border-radius:6px;border:1px solid var(--pico-muted-border-color);background:transparent;color:var(--pico-muted-color);font-size:1rem;cursor:pointer;flex-shrink:0;"
+                onmouseenter="this.style.border='1px solid #ef4444';this.style.color='#ef4444';this.style.background='rgba(239,68,68,0.08)';"
+                onmouseleave="this.style.border='1px solid var(--pico-muted-border-color)';this.style.color='var(--pico-muted-color)';this.style.background='transparent';">✕</span>
+            {% endif %}
+        </div>
+    </div>
 </div>
 
 {% if posts %}
@@ -18,6 +50,13 @@
                 {% if post.excerpt %}
                     <p class="post-excerpt">{{ post.excerpt }}</p>
                 {% endif %}
+                {% if post.tags.exists %}
+                <div class="post-card-tags">
+                    {% for tag in post.tags.all %}
+                    <span class="tag-badge tag-badge--sm">{{ tag.name }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
             </div>
             <span class="post-card-arrow">→</span>
         </a>
@@ -25,7 +64,7 @@
     </div>
 {% else %}
     <div class="empty-state">
-        <p>No hay posts publicados todavía.</p>
+        <p>No hay posts{% if active_tag %} con este tag{% endif %} todavía.</p>
     </div>
 {% endif %}
 {% endblock %}
