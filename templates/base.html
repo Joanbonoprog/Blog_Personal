@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="{% static 'css/theme.css' %}">
 </head>
 <body>
+    {% load i18n %}
     <header class="site-header">
         <div class="container">
             <nav>
@@ -17,9 +18,32 @@
                 </ul>
                 <ul>
                     <li>
-                        <button class="theme-toggle contrast outline" id="themeToggle" aria-label="Cambiar tema">
-                            <span id="themeIcon">☀️</span>
-                        </button>
+                        <form action="{% url 'set_language' %}" method="post" id="langForm" style="margin:0;">
+                            {% csrf_token %}
+                            <input name="next" type="hidden" value="{{ request.get_full_path }}">
+                            <select name="language" class="lang-select" onchange="document.getElementById('langForm').submit()">
+                                <option value="es" {% if LANGUAGE_CODE == 'es' %}selected{% endif %}>ES</option>
+                                <option value="en" {% if LANGUAGE_CODE == 'en' %}selected{% endif %}>EN</option>
+                            </select>
+                        </form>
+                    </li>
+                    <li>
+                        <span class="theme-toggle" id="themeToggle" aria-label="Cambiar tema" style="display:inline-flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:999px;border:1px solid var(--pico-muted-border-color);background:transparent;cursor:pointer;">
+                            <svg id="iconSun" xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+                                <circle cx="12" cy="12" r="4"/>
+                                <line x1="12" y1="2" x2="12" y2="5"/>
+                                <line x1="12" y1="19" x2="12" y2="22"/>
+                                <line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/>
+                                <line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/>
+                                <line x1="2" y1="12" x2="5" y2="12"/>
+                                <line x1="19" y1="12" x2="22" y2="12"/>
+                                <line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/>
+                                <line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/>
+                            </svg>
+                            <svg id="iconMoon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                            </svg>
+                        </span>
                     </li>
                 </ul>
             </nav>
@@ -32,7 +56,7 @@
 
     <footer class="site-footer">
         <div class="container">
-            <p class="footer-built-label">Construido con</p>
+            <p class="footer-built-label">{% trans "Construido con" %}</p>
             <div class="footer-tech">
                 <a href="https://www.python.org" target="_blank" rel="noopener" class="tech-card">
                     <span class="tech-icon" style="background:#3776AB;">
@@ -52,6 +76,12 @@
                     </span>
                     <span class="tech-name">PostgreSQL</span>
                 </a>
+                <a href="https://picocss.com" target="_blank" rel="noopener" class="tech-card">
+                    <span class="tech-icon" style="background:#1a1a2e;">
+                        <svg viewBox="-539 63 772 1019" fill="white" xmlns="http://www.w3.org/2000/svg"><path d="M232.74 434.876c0 238.4-100.209 372-279.663 372-106.734 0-185.354-51.092-218.744-135.573h-5.236V1080.357H-539.429V73.329h269.191V203.666h4.591c34.719-88.408 111.366-140.809 215.481-140.809 182.052 0 282.905 132.955 282.905 372.019zm-275.091 0c0-100.21-44.506-165.056-114.588-165.056-70.082 0-114.588 64.846-115.272 165.7.664 101.498 44.506 164.391 115.272 164.391 70.726 0 114.588-64.182 114.588-165.035zm373.91 238.179c0-75.157 60.778-135.935 135.935-135.935 75.157 0 135.934 60.778 135.934 135.935 0 75.157-60.777 135.935-135.934 135.935-75.157 0-135.935-60.778-135.935-135.935z"/></svg>
+                    </span>
+                    <span class="tech-name">Pico CSS</span>
+                </a>
                 <a href="https://www.docker.com" target="_blank" rel="noopener" class="tech-card">
                     <span class="tech-icon" style="background:#2496ED;">
                         <svg viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg"><path d="M13.983 11.078h2.119a.186.186 0 0 0 .186-.186V9.006a.186.186 0 0 0-.186-.186h-2.119a.185.185 0 0 0-.185.185v1.888c0 .102.083.185.185.185m-2.954-5.43h2.118a.186.186 0 0 0 .186-.186V3.574a.186.186 0 0 0-.186-.185h-2.118a.185.185 0 0 0-.185.185v1.888c0 .102.082.185.185.185m0 2.716h2.118a.187.187 0 0 0 .186-.186V6.29a.186.186 0 0 0-.186-.185h-2.118a.185.185 0 0 0-.185.185v1.887c0 .102.082.185.185.186m-2.93 0h2.12a.186.186 0 0 0 .184-.186V6.29a.185.185 0 0 0-.185-.185H8.1a.185.185 0 0 0-.185.185v1.887c0 .102.083.185.185.186m-2.964 0h2.119a.186.186 0 0 0 .185-.186V6.29a.185.185 0 0 0-.185-.185H5.136a.186.186 0 0 0-.186.185v1.887c0 .102.084.185.186.186m5.893 2.715h2.118a.186.186 0 0 0 .186-.185V9.006a.186.186 0 0 0-.186-.186h-2.118a.185.185 0 0 0-.185.185v1.888c0 .102.082.185.185.185m-2.93 0h2.12a.185.185 0 0 0 .184-.185V9.006a.185.185 0 0 0-.184-.186h-2.12a.185.185 0 0 0-.184.185v1.888c0 .102.083.185.185.185m-2.964 0h2.119a.185.185 0 0 0 .185-.185V9.006a.185.185 0 0 0-.184-.186h-2.12a.186.186 0 0 0-.186.186v1.887c0 .102.084.185.186.185m-2.92 0h2.12a.185.185 0 0 0 .184-.185V9.006a.185.185 0 0 0-.184-.186h-2.12a.185.185 0 0 0-.185.185v1.888c0 .102.082.185.185.185M23.763 9.89c-.299-.495-.881-.668-1.481-.548-.121-.026-.244-.04-.367-.04-.16 0-.319.019-.475.057a4.532 4.532 0 0 0-.593-1.255 4.53 4.53 0 0 0-1.146-1.108A4.315 4.315 0 0 0 18.5 6.5a5.86 5.86 0 0 0-2.319.477 5.8 5.8 0 0 0-.701.369 3.818 3.818 0 0 0-1.354-.881A3.905 3.905 0 0 0 12.8 6.2c-.42 0-.836.063-1.233.184a4.29 4.29 0 0 0-1.069.521 4.874 4.874 0 0 0-.861.79 5.736 5.736 0 0 0-.651 1.03H2.069A2.07 2.07 0 0 0 0 10.795v3.993a2.07 2.07 0 0 0 2.069 2.069h19.862a2.07 2.07 0 0 0 2.069-2.069v-3.993a2.07 2.07 0 0 0-.237-.905z"/></svg>
@@ -67,20 +97,28 @@
         (function () {
             const html = document.documentElement;
             const btn = document.getElementById('themeToggle');
-            const icon = document.getElementById('themeIcon');
+            const iconSun = document.getElementById('iconSun');
+            const iconMoon = document.getElementById('iconMoon');
+
+            function applyTheme(theme) {
+                html.setAttribute('data-theme', theme);
+                if (theme === 'dark') {
+                    iconSun.style.display = 'block';
+                    iconMoon.style.display = 'none';
+                } else {
+                    iconSun.style.display = 'none';
+                    iconMoon.style.display = 'block';
+                }
+            }
 
             const saved = localStorage.getItem('theme');
             const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            const theme = saved || (prefersDark ? 'dark' : 'light');
-
-            html.setAttribute('data-theme', theme);
-            icon.textContent = theme === 'dark' ? '☀️' : '🌙';
+            applyTheme(saved || (prefersDark ? 'dark' : 'light'));
 
             btn.addEventListener('click', function () {
                 const current = html.getAttribute('data-theme');
                 const next = current === 'dark' ? 'light' : 'dark';
-                html.setAttribute('data-theme', next);
-                icon.textContent = next === 'dark' ? '☀️' : '🌙';
+                applyTheme(next);
                 localStorage.setItem('theme', next);
             });
         })();

@@ -1,26 +1,31 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ post.title }} – Joan Bono{% endblock %}
+{% block title %}{{ post.get_title }} – Joan Bono{% endblock %}
 
 {% block content %}
 <div class="post-detail">
     <header class="post-detail-header">
         <a href="{% url 'post_list' %}" class="back-link">← Volver al blog</a>
-        <h1>{{ post.title }}</h1>
+        <h1>{{ post.get_title }}</h1>
         <div class="post-detail-meta">
             <small class="post-date">{{ post.created_at|date:"d M Y" }}</small>
             {% if post.tags.exists %}
             <div class="post-detail-tags">
                 {% for tag in post.tags.all %}
-                <a href="{% url 'post_list' %}?tag={{ tag.slug }}" class="tag-badge">{{ tag.name }}</a>
+                <span onclick="window.location.href='{% url 'post_list' %}?tag={{ tag.slug }}'"
+                    style="display:inline-block;font-size:0.72rem;font-weight:600;padding:0.2rem 0.65rem;border-radius:999px;border:1px solid {{ tag.color }};color:{{ tag.color }};text-decoration:none;background:transparent;cursor:pointer;white-space:nowrap;"
+                    onmouseenter="this.style.background='{{ tag.color }}';this.style.color='#fff';"
+                    onmouseleave="this.style.background='transparent';this.style.color='{{ tag.color }}';">{{ tag.name }}</span>
                 {% endfor %}
             </div>
             {% endif %}
         </div>
     </header>
 
-    <article class="post-content">
-        {{ post.content|safe }}
-    </article>
+    <hr style="margin: 1.5rem 0; border-color: var(--pico-muted-border-color);">
+
+    <div class="post-content">
+        {{ post.get_content|safe }}
+    </div>
 </div>
 {% endblock %}

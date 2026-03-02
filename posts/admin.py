@@ -5,7 +5,11 @@ from .models import Post, Tag
 
 
 class PostAdminForm(forms.ModelForm):
-    content = forms.CharField(widget=TinyMCE(mce_attrs={
+    content_es = forms.CharField(required=False, widget=TinyMCE(mce_attrs={
+        'skin': 'oxide-dark',
+        'content_css': 'dark',
+    }))
+    content_en = forms.CharField(required=False, widget=TinyMCE(mce_attrs={
         'skin': 'oxide-dark',
         'content_css': 'dark',
     }))
@@ -24,8 +28,8 @@ class TagAdmin(admin.ModelAdmin):
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
     form = PostAdminForm
-    list_display = ('title', 'published', 'created_at')
+    list_display = ('__str__', 'published', 'created_at')
     list_filter = ('published', 'tags')
-    search_fields = ('title', 'content')
-    prepopulated_fields = {'slug': ('title',)}
+    search_fields = ('title_es', 'title_en', 'content_es', 'content_en')
+    prepopulated_fields = {'slug': ('title_es',)}
     filter_horizontal = ('tags',)

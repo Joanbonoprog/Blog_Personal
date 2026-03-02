@@ -45,14 +45,38 @@
     letter-spacing: 0.05em;
 }
 
+/* Language selector */
+.lang-select {
+    font-size: 0.85rem;
+    padding: 0.3rem 0.5rem;
+    border-radius: 8px;
+    border: 1px solid var(--pico-muted-border-color);
+    background: var(--pico-background-color);
+    color: var(--pico-color);
+    cursor: pointer;
+    margin-bottom: 0;
+    width: auto !important;
+}
+
 /* Theme toggle */
 .theme-toggle {
-    padding: 0.3rem 0.65rem;
-    font-size: 1rem;
-    border-radius: 999px;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 999px !important;
+    border: 1px solid var(--pico-muted-border-color) !important;
+    background: transparent !important;
     cursor: pointer;
-    line-height: 1;
     margin-bottom: 0;
+    box-shadow: none !important;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.theme-toggle:hover {
+    border-color: var(--pico-primary) !important;
+    background: transparent !important;
 }
 
 /* Posts toolbar */
@@ -125,22 +149,24 @@
 
 /* Tag badges */
 .tag-badge {
-    display: inline-block;
-    font-size: 0.72rem;
-    font-weight: 500;
-    padding: 0.2rem 0.6rem;
-    border-radius: 999px;
-    border: 1px solid var(--pico-muted-border-color);
-    color: var(--pico-muted-color);
-    text-decoration: none;
-    transition: border-color 0.15s, color 0.15s, background 0.15s;
+    display: inline-block !important;
+    font-size: 0.72rem !important;
+    font-weight: 600 !important;
+    padding: 0.2rem 0.65rem !important;
+    border-radius: 999px !important;
+    border: 1px solid var(--pico-primary) !important;
+    color: var(--pico-primary) !important;
+    text-decoration: none !important;
+    background: transparent !important;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
     white-space: nowrap;
 }
 
 .tag-badge:hover {
-    border-color: var(--pico-primary);
-    color: var(--pico-primary);
-    text-decoration: none;
+    background: var(--pico-primary) !important;
+    color: #fff !important;
+    text-decoration: none !important;
 }
 
 .tag-badge--active {
@@ -278,6 +304,11 @@
 
 .post-content {
     line-height: 1.8;
+    background: transparent;
+    box-shadow: none;
+    border: none;
+    padding: 0;
+    margin: 0;
 }
 
 .post-content img {
