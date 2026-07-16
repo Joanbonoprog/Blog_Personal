@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+from django.utils.translation import gettext_lazy as _
 
 load_dotenv()
 
@@ -10,7 +11,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-changeme')
 
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -26,12 +27,16 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+if os.getenv('DJANGO_ENV') == 'production':
+    MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
 
 ROOT_URLCONF = 'config.urls'
 
@@ -44,6 +49,7 @@ TEMPLATES = [
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
+                'django.template.context_processors.i18n',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
@@ -79,7 +85,12 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-LANGUAGE_CODE = 'es-es'
+LANGUAGE_CODE = 'es'
+LANGUAGES = [
+    ('es', _('Español')),
+    ('en', _('English')),
+]
+LOCALE_PATHS = [BASE_DIR / 'locale']
 TIME_ZONE = 'Europe/Madrid'
 USE_I18N = True
 USE_TZ = True
@@ -95,8 +106,11 @@ TINYMCE_DEFAULT_CONFIG = {
     'height': 500,
     'plugins': 'image link lists table code codesample',
     'toolbar': 'undo redo | bold italic | alignleft aligncenter alignright | bullist numlist | link image table codesample | code',
-    'images_upload_url': '/admin/tinymce/upload/',
-    'automatic_uploads': True,
+    # NOTE: automatic image uploads are disabled because django-tinymce does
+    # not ship a working upload endpoint out of the box. Insert images via
+    # the "image" dialog's Source URL field, or upload media manually and
+    # reference the resulting /media/ URL.
+    'automatic_uploads': False,
     'file_picker_types': 'image',
 }
 
@@ -104,6 +118,15 @@ if os.getenv('DJANGO_ENV') == 'production':
     FORCE_SCRIPT_NAME = '/blog'
     STATIC_URL = '/blog/static/'
     MEDIA_URL = '/blog/media/'
+    CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',')
+    STORAGES = {
+        'staticfiles': {
+            'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+        },
+        'default': {
+            'BACKEND': 'django.core.files.storage.FileSystemStorage',
+        },
+    }
 else:
     STATIC_URL = '/static/'
     MEDIA_URL = '/media/'

@@ -29,6 +29,15 @@ static_collected/
 
 # Docker
 *.env.docker
+docker-compose.override.yml
+
+# SSL certificates
+certbot/
+*.pem
+*.key
+
+# PostgreSQL data
+postgres_data/
 
 # IDE
 .idea/
