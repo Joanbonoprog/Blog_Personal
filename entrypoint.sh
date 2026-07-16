@@ -2,8 +2,8 @@
 set -e
 
 # Wait for PostgreSQL to be ready
-if [ "$DB_HOST" = "postgres" ]; then
-    echo "Waiting for PostgreSQL..."
+if [ -n "$DB_HOST" ] && [ "$DB_HOST" != "localhost" ]; then
+    echo "Waiting for PostgreSQL at $DB_HOST:$DB_PORT..."
     while ! nc -z $DB_HOST $DB_PORT; do
         sleep 0.1
     done

@@ -154,22 +154,23 @@ portfolio domain, **not** the domain root. Dokploy's built-in Traefik
 instance handles the reverse proxy and SSL (Let's Encrypt) automatically,
 so this project does **not** ship its own Nginx/Certbot setup.
 
-### 1. Dokploy configuration
+### Step-by-step guide
 
-1. Create a new app in Dokploy pointing at this repository (Docker Compose
-   or Dockerfile-based app — `docker-compose.prod.yml` is provided for the
-   Compose flow).
-2. In Dokploy's domain settings, add a route rule with:
-   - **Path prefix:** `/blog`
-   - **Strip prefix:** enabled — Django's `FORCE_SCRIPT_NAME='/blog'`
-     (see `config/settings.py`) expects to receive requests **without**
-     the `/blog` prefix internally; it only re-adds it when generating
-     URLs (`{% url %}`, `{% static %}`, redirects, etc.). If the prefix
-     isn't stripped by Traefik, all routes will 404.
-   - **Target port:** `8000`
-3. Set the environment variables below in Dokploy's UI (never commit them).
+**1. Push the repository**
 
-### 2. Required environment variables
+Make sure the latest code (including `Dockerfile`, `docker-compose.prod.yml`,
+`.dockerignore`, `entrypoint.sh`) is pushed to the Git remote Dokploy will
+pull from.
+
+**2. Create the project in Dokploy**
+
+- In the Dokploy dashboard, click **Create Project** → **Compose**.
+- Connect it to this repository/branch.
+- Set the **Compose file path** to `docker-compose.prod.yml`.
+
+**3. Configure environment variables**
+
+In the project's **Environment** tab, add:
 
 ```bash
 DJANGO_ENV=production
@@ -182,16 +183,57 @@ DB_USER=postgres
 DB_PASSWORD=a-strong-password
 DB_HOST=db
 DB_PORT=5432
+# Optional: auto-create an admin user on first boot
+DJANGO_SUPERUSER_USERNAME=admin
+DJANGO_SUPERUSER_PASSWORD=a-strong-admin-password
+DJANGO_SUPERUSER_EMAIL=you@joanbonoprog.es
 ```
 
-### 3. Persistent volumes
+Generate a strong `SECRET_KEY` with:
+```bash
+python -c "import secrets; print(secrets.token_urlsafe(50))"
+```
 
-`docker-compose.prod.yml` mounts named volumes for `postgres_data`,
-`staticfiles` and `media` so uploaded images and the database survive
-redeploys. Make sure Dokploy is configured to reuse volumes across
-deployments rather than recreating them from scratch.
+**4. Configure the domain and path routing**
 
-### 4. Useful commands
+In the project's **Domains** tab:
+- **Host:** `joanbonoprog.es`
+- **Path:** `/blog`
+- **Strip path prefix:** **enabled** — Django's `FORCE_SCRIPT_NAME='/blog'`
+  (`config/settings.py`) expects requests **without** the `/blog` prefix
+  internally; it only re-adds it when generating URLs (`{% url %}`,
+  `{% static %}`, redirects, etc.). If Traefik doesn't strip it, every
+  route will 404.
+- **Container port:** `8000` (matches the `web` service in
+  `docker-compose.prod.yml`).
+- Enable **HTTPS** so Dokploy provisions the Let's Encrypt certificate for
+  the domain (shared with the portfolio app already on that domain).
+
+**5. Deploy**
+
+Click **Deploy**. Dokploy will:
+1. Build the image from `Dockerfile` (installs deps, runs `collectstatic`
+   with the whitenoise manifest storage).
+2. Start `db` (PostgreSQL) and wait for its healthcheck.
+3. Start `web`, which via `entrypoint.sh` runs migrations, optionally
+   creates the superuser, then starts Gunicorn on port 8000.
+
+**6. Verify the deployment**
+
+- `https://joanbonoprog.es/blog/` → post list loads with styling (confirms
+  static files work).
+- `https://joanbonoprog.es/blog/admin/` → admin login page.
+- `https://joanbonoprog.es/blog/sitemap.xml` and `/blog/rss.xml` → valid XML.
+- Create a test post in the admin, confirm it renders and images inserted
+  via URL in TinyMCE display correctly.
+
+**7. Confirm persistence**
+
+Trigger a redeploy from Dokploy and verify:
+- Previously created posts/tags still exist (`postgres_data` volume).
+- Uploaded media images are still reachable (`media` volume).
+
+### Useful commands
 
 ```bash
 # View logs
@@ -207,6 +249,16 @@ docker-compose -f docker-compose.prod.yml exec db pg_dump -U postgres blog > bac
 # Access container shell
 docker-compose -f docker-compose.prod.yml exec web bash
 ```
+
+### Troubleshooting
+
+| Symptom | Likely cause |
+|---|---|
+| All `/blog/*` routes return 404 | Path prefix not stripped by Traefik before reaching Django |
+| CSS/JS missing (unstyled page) | `collectstatic` ran without `DJANGO_ENV=production` — rebuild the image |
+| `CSRF verification failed` on login | `CSRF_TRUSTED_ORIGINS` missing the `https://` scheme or the exact domain |
+| Uploaded images disappear after redeploy | `media` volume not mounted or Dokploy recreated volumes |
+| 400 Bad Request | Domain missing from `ALLOWED_HOSTS` |
 
 ## Database
 
