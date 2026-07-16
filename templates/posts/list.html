@@ -5,6 +5,19 @@
 
 {% block content %}
 <div style="display:flex;flex-direction:row;align-items:flex-end;justify-content:flex-start;gap:2.5rem;margin-bottom:1.75rem;flex-wrap:wrap;">
+    <div style="display:flex;flex-direction:column;gap:0.3rem;min-width:220px;flex:1 1 220px;">
+        <span class="toolbar-label">{% trans "Buscar" %}</span>
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+            <input type="text" id="searchInput" value="{{ query|default:'' }}" placeholder="{% trans 'Buscar por título...' %}" style="width:100%;margin-bottom:0;"
+                onkeydown="if(event.key==='Enter'){const p=new URLSearchParams(window.location.search);p.set('q',this.value);window.location.search=p.toString();}">
+            {% if query %}
+            <span onclick="const p=new URLSearchParams(window.location.search);p.delete('q');window.location.search=p.toString()" class="toolbar-reset" title="{% trans 'Quitar búsqueda' %}"
+                style="display:inline-flex;align-items:center;justify-content:center;width:46px;height:46px;border-radius:6px;border:1px solid var(--pico-muted-border-color);background:transparent;color:var(--pico-muted-color);font-size:1rem;cursor:pointer;flex-shrink:0;"
+                onmouseenter="this.style.border='1px solid #ef4444';this.style.color='#ef4444';this.style.background='rgba(239,68,68,0.08)';"
+                onmouseleave="this.style.border='1px solid var(--pico-muted-border-color)';this.style.color='var(--pico-muted-color)';this.style.background='transparent';">✕</span>
+            {% endif %}
+        </div>
+    </div>
     <div style="display:flex;flex-direction:column;gap:0.3rem;min-width:180px;">
         <span class="toolbar-label">{% trans "Filtrar por tema" %}</span>
         <div style="display:flex;align-items:center;gap:0.5rem;">
@@ -103,7 +116,7 @@
     </div>
 {% else %}
     <div class="empty-state">
-        <p>No hay posts{% if active_tag %} con este tag{% endif %} todavía.</p>
+        <p>{% if query %}{% trans "No se encontraron posts para" %} "{{ query }}".{% else %}{% trans "No hay posts todavía." %}{% endif %}</p>
     </div>
 {% endif %}
 {% endblock %}

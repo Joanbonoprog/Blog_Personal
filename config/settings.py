@@ -106,8 +106,11 @@ TINYMCE_DEFAULT_CONFIG = {
     'height': 500,
     'plugins': 'image link lists table code codesample',
     'toolbar': 'undo redo | bold italic | alignleft aligncenter alignright | bullist numlist | link image table codesample | code',
-    'images_upload_url': '/admin/tinymce/upload/',
-    'automatic_uploads': True,
+    # NOTE: automatic image uploads are disabled because django-tinymce does
+    # not ship a working upload endpoint out of the box. Insert images via
+    # the "image" dialog's Source URL field, or upload media manually and
+    # reference the resulting /media/ URL.
+    'automatic_uploads': False,
     'file_picker_types': 'image',
 }
 

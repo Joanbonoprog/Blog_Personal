@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load i18n %}
 
 {% block title %}{{ post.get_title }} – Joan Bono{% endblock %}
 
@@ -6,7 +7,19 @@
 <div class="post-detail">
     <header class="post-detail-header">
         <a href="{% url 'post_list' %}" class="back-link">← Volver al blog</a>
-        <h1>{{ post.get_title }}</h1>
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
+            <h1 style="margin-bottom:0;">{{ post.get_title }}</h1>
+            <span id="copyLinkBtn" onclick="copyPostLink()" title="{% trans 'Copiar enlace' %}"
+                style="display:inline-flex !important;align-items:center;gap:0.4rem;padding:0.4rem 0.75rem;border-radius:999px;border:1px solid var(--pico-muted-border-color) !important;background:transparent !important;color:var(--pico-color) !important;cursor:pointer;font-size:0.85rem;white-space:nowrap;flex-shrink:0;transition:border-color 0.15s;box-shadow:none !important;"
+                onmouseenter="this.style.borderColor='var(--pico-primary)';"
+                onmouseleave="this.style.borderColor='var(--pico-muted-border-color)';">
+                <svg id="copyIcon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                </svg>
+                <span id="copyLabel">{% trans "Copiar enlace" %}</span>
+            </span>
+        </div>
         <div class="post-detail-meta">
             <small class="post-date">{{ post.created_at|date:"d M Y" }}</small>
             {% if post.tags.exists %}
@@ -28,4 +41,21 @@
         {{ post.get_content|safe }}
     </div>
 </div>
+
+<script>
+    function copyPostLink() {
+        navigator.clipboard.writeText(window.location.href).then(function () {
+            const label = document.getElementById('copyLabel');
+            const icon = document.getElementById('copyIcon');
+            const originalLabel = label.textContent;
+            const originalIcon = icon.innerHTML;
+            label.textContent = "{% trans 'Copiado' %}";
+            icon.innerHTML = '<polyline points="20 6 9 17 4 12"></polyline>';
+            setTimeout(function () {
+                label.textContent = originalLabel;
+                icon.innerHTML = originalIcon;
+            }, 2000);
+        });
+    }
+</script>
 {% endblock %}
