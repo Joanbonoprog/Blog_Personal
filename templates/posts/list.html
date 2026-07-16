@@ -1,33 +1,122 @@
 {% extends 'base.html' %}
+{% load i18n %}
 
 {% block title %}Blog – Joan Bono{% endblock %}
 
 {% block content %}
-<div class="posts-header">
-    <h1>Blog</h1>
-    <p class="posts-subtitle">Artículos sobre desarrollo, tecnología y más.</p>
+<div style="display:flex;flex-direction:row;align-items:flex-end;justify-content:flex-start;gap:2.5rem;margin-bottom:1.75rem;flex-wrap:wrap;">
+    <div style="display:flex;flex-direction:column;gap:0.3rem;min-width:220px;flex:1 1 220px;">
+        <span class="toolbar-label">{% trans "Buscar" %}</span>
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+            <input type="text" id="searchInput" value="{{ query|default:'' }}" placeholder="{% trans 'Buscar por título...' %}" style="width:100%;margin-bottom:0;"
+                onkeydown="if(event.key==='Enter'){const p=new URLSearchParams(window.location.search);p.set('q',this.value);window.location.search=p.toString();}">
+            {% if query %}
+            <span onclick="const p=new URLSearchParams(window.location.search);p.delete('q');window.location.search=p.toString()" class="toolbar-reset" title="{% trans 'Quitar búsqueda' %}"
+                style="display:inline-flex;align-items:center;justify-content:center;width:46px;height:46px;border-radius:6px;border:1px solid var(--pico-muted-border-color);background:transparent;color:var(--pico-muted-color);font-size:1rem;cursor:pointer;flex-shrink:0;"
+                onmouseenter="this.style.border='1px solid #ef4444';this.style.color='#ef4444';this.style.background='rgba(239,68,68,0.08)';"
+                onmouseleave="this.style.border='1px solid var(--pico-muted-border-color)';this.style.color='var(--pico-muted-color)';this.style.background='transparent';">✕</span>
+            {% endif %}
+        </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:0.3rem;min-width:180px;">
+        <span class="toolbar-label">{% trans "Filtrar por tema" %}</span>
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+            <select style="width:100%;margin-bottom:0;" onchange="const p=new URLSearchParams(window.location.search);p.set('tag',this.value);window.location.search=p.toString()">
+                <option value="">{% trans "Todos los temas" %}</option>
+                {% for tag in all_tags %}
+                <option value="{{ tag.slug }}" {% if active_tag == tag.slug %}selected{% endif %}>{{ tag.name }}</option>
+                {% endfor %}
+            </select>
+            {% if active_tag %}
+            <span onclick="const p=new URLSearchParams(window.location.search);p.delete('tag');window.location.search=p.toString()" class="toolbar-reset" title="Quitar filtro"
+                style="display:inline-flex;align-items:center;justify-content:center;width:46px;height:46px;border-radius:6px;border:1px solid var(--pico-muted-border-color);background:transparent;color:var(--pico-muted-color);font-size:1rem;cursor:pointer;flex-shrink:0;"
+                onmouseenter="this.style.border='1px solid #ef4444';this.style.color='#ef4444';this.style.background='rgba(239,68,68,0.08)';"
+                onmouseleave="this.style.border='1px solid var(--pico-muted-border-color)';this.style.color='var(--pico-muted-color)';this.style.background='transparent';">✕</span>
+            {% endif %}
+        </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:0.3rem;min-width:140px;">
+        <span class="toolbar-label">{% trans "Año" %}</span>
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+            <select style="width:100%;margin-bottom:0;" onchange="const p=new URLSearchParams(window.location.search);p.set('year',this.value);p.delete('month');window.location.search=p.toString()">
+                <option value="">{% trans "Todos" %}</option>
+                {% for d in all_years %}
+                <option value="{{ d.year }}" {% if active_year == d.year|stringformat:'s' %}selected{% endif %}>{{ d.year }}</option>
+                {% endfor %}
+            </select>
+            {% if active_year %}
+            <span onclick="const p=new URLSearchParams(window.location.search);p.delete('year');p.delete('month');window.location.search=p.toString()" class="toolbar-reset" title="Quitar año"
+                style="display:inline-flex;align-items:center;justify-content:center;width:46px;height:46px;border-radius:6px;border:1px solid var(--pico-muted-border-color);background:transparent;color:var(--pico-muted-color);font-size:1rem;cursor:pointer;flex-shrink:0;"
+                onmouseenter="this.style.border='1px solid #ef4444';this.style.color='#ef4444';this.style.background='rgba(239,68,68,0.08)';"
+                onmouseleave="this.style.border='1px solid var(--pico-muted-border-color)';this.style.color='var(--pico-muted-color)';this.style.background='transparent';">✕</span>
+            {% endif %}
+        </div>
+    </div>
+    {% if active_year and all_months %}
+    <div style="display:flex;flex-direction:column;gap:0.3rem;min-width:160px;">
+        <span class="toolbar-label">{% trans "Mes" %}</span>
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+            <select style="width:100%;margin-bottom:0;" onchange="const p=new URLSearchParams(window.location.search);p.set('month',this.value);window.location.search=p.toString()">
+                <option value="">{% trans "Todos" %}</option>
+                {% for d in all_months %}
+                <option value="{{ d.month }}" {% if active_month == d.month|stringformat:'s' %}selected{% endif %}>{{ d|date:"F"|capfirst }}</option>
+                {% endfor %}
+            </select>
+            {% if active_month %}
+            <span onclick="const p=new URLSearchParams(window.location.search);p.delete('month');window.location.search=p.toString()" class="toolbar-reset" title="Quitar mes"
+                style="display:inline-flex;align-items:center;justify-content:center;width:46px;height:46px;border-radius:6px;border:1px solid var(--pico-muted-border-color);background:transparent;color:var(--pico-muted-color);font-size:1rem;cursor:pointer;flex-shrink:0;"
+                onmouseenter="this.style.border='1px solid #ef4444';this.style.color='#ef4444';this.style.background='rgba(239,68,68,0.08)';"
+                onmouseleave="this.style.border='1px solid var(--pico-muted-border-color)';this.style.color='var(--pico-muted-color)';this.style.background='transparent';">✕</span>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+    <div style="display:flex;flex-direction:column;gap:0.3rem;min-width:180px;">
+        <span class="toolbar-label">{% trans "Ordenar por" %}</span>
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+            <select style="width:100%;margin-bottom:0;" onchange="const p=new URLSearchParams(window.location.search);p.set('order',this.value);window.location.search=p.toString()">
+                <option value="newest" {% if order == 'newest' %}selected{% endif %}>{% trans "Más recientes" %}</option>
+                <option value="oldest" {% if order == 'oldest' %}selected{% endif %}>{% trans "Más antiguos" %}</option>
+                <option value="az" {% if order == 'az' %}selected{% endif %}>A → Z</option>
+                <option value="za" {% if order == 'za' %}selected{% endif %}>Z → A</option>
+            </select>
+            {% if order != 'newest' %}
+            <span onclick="const p=new URLSearchParams(window.location.search);p.delete('order');window.location.search=p.toString()" class="toolbar-reset" title="Restablecer orden"
+                style="display:inline-flex;align-items:center;justify-content:center;width:46px;height:46px;border-radius:6px;border:1px solid var(--pico-muted-border-color);background:transparent;color:var(--pico-muted-color);font-size:1rem;cursor:pointer;flex-shrink:0;"
+                onmouseenter="this.style.border='1px solid #ef4444';this.style.color='#ef4444';this.style.background='rgba(239,68,68,0.08)';"
+                onmouseleave="this.style.border='1px solid var(--pico-muted-border-color)';this.style.color='var(--pico-muted-color)';this.style.background='transparent';">✕</span>
+            {% endif %}
+        </div>
+    </div>
 </div>
 
 {% if posts %}
-    <div class="posts-list">
+    <div class="posts-grid">
         {% for post in posts %}
-        <article class="post-card">
-            <header>
-                <h2><a href="{% url 'post_detail' post.slug %}">{{ post.title }}</a></h2>
+        <a href="{% url 'post_detail' post.slug %}" class="post-card">
+            <div class="post-card-inner">
                 <small class="post-date">{{ post.created_at|date:"d M Y" }}</small>
-            </header>
-            {% if post.excerpt %}
-                <p class="post-excerpt">{{ post.excerpt }}</p>
-            {% endif %}
-            <footer>
-                <a href="{% url 'post_detail' post.slug %}" class="read-more">Leer más →</a>
-            </footer>
-        </article>
+                <h2>{{ post.get_title }}</h2>
+                {% with excerpt=post.get_excerpt %}
+                {% if excerpt %}
+                    <p class="post-excerpt">{{ excerpt }}</p>
+                {% endif %}
+                {% endwith %}
+                {% if post.tags.exists %}
+                <div class="post-card-tags">
+                    {% for tag in post.tags.all %}
+                    <span style="display:inline-block;font-size:0.65rem;font-weight:600;padding:0.15rem 0.45rem;border-radius:999px;border:1px solid {{ tag.color }};color:{{ tag.color }};background:transparent;white-space:nowrap;">{{ tag.name }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            <span class="post-card-arrow">→</span>
+        </a>
         {% endfor %}
     </div>
 {% else %}
     <div class="empty-state">
-        <p>No hay posts publicados todavía.</p>
+        <p>{% if query %}{% trans "No se encontraron posts para" %} "{{ query }}".{% else %}{% trans "No hay posts todavía." %}{% endif %}</p>
     </div>
 {% endif %}
 {% endblock %}

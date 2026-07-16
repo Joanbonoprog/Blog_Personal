@@ -1,0 +1,60 @@
+# English translations for Blog_Personal
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en\n"
+
+msgid "Filtrar por tema"
+msgstr "Filter by topic"
+
+msgid "Todos los temas"
+msgstr "All topics"
+
+msgid "Año"
+msgstr "Year"
+
+msgid "Todos"
+msgstr "All"
+
+msgid "Mes"
+msgstr "Month"
+
+msgid "Ordenar por"
+msgstr "Sort by"
+
+msgid "Más recientes"
+msgstr "Newest"
+
+msgid "Más antiguos"
+msgstr "Oldest"
+
+msgid "Construido con"
+msgstr "Built with"
+
+msgid "Buscar"
+msgstr "Search"
+
+msgid "Buscar por título..."
+msgstr "Search by title..."
+
+msgid "Quitar búsqueda"
+msgstr "Clear search"
+
+msgid "No se encontraron posts para"
+msgstr "No posts found for"
+
+msgid "No hay posts todavía."
+msgstr "No posts yet."
+
+msgid "Copiar enlace"
+msgstr "Copy link"
+
+msgid "Copiado"
+msgstr "Copied"
+
+msgid "Español"
+msgstr "Spanish"
+
+msgid "English"
+msgstr "English"
