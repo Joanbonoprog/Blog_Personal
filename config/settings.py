@@ -20,6 +20,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_otp',
+    'django_otp.plugins.otp_totp',
+    'two_factor',
     'posts',
     'tinymce',
 ]
@@ -31,6 +34,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django_otp.middleware.OTPMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -101,6 +105,11 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Two-factor authentication URLs. With FORCE_SCRIPT_NAME='/blog' these become
+# /blog/login/ and /blog/admin/ respectively in production.
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/admin/'
 
 TINYMCE_DEFAULT_CONFIG = {
     'height': 500,

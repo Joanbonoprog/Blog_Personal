@@ -277,3 +277,17 @@ Services include health checks:
 - `SECRET_KEY`, DB credentials and other secrets set via Dokploy env vars, never committed
 - `DEBUG=False` and explicit `ALLOWED_HOSTS`/`CSRF_TRUSTED_ORIGINS` enforced in production
 - TinyMCE automatic image uploads disabled (no working upload endpoint shipped by django-tinymce) — images are inserted via URL instead
+
+## Two-factor authentication (2FA) for the admin
+
+The Django admin is protected with TOTP via `django-two-factor-auth`.
+
+### First-time bootstrap
+
+1. Deploy with `ADMIN_2FA_ENABLED=False`.
+2. Log in at `/blog/admin/` as the superuser.
+3. Go to `/blog/setup/` and scan the QR code with Google Authenticator, Authy, or similar.
+4. Save the backup codes shown.
+5. Change `ADMIN_2FA_ENABLED=True` in Dokploy environment variables and redeploy.
+
+From then on, any access to `/blog/admin/` requires password + TOTP token.
