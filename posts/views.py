@@ -1,7 +1,9 @@
+from django.conf import settings
 from django.shortcuts import render, get_object_or_404
-from django.http import JsonResponse, Http404
-from django.views.decorators.http import require_GET
-from django.utils.translation import get_language
+from django.http import JsonResponse, Http404, HttpResponseRedirect
+from django.views.decorators.http import require_GET, require_POST
+from django.utils.translation import get_language, check_for_language
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.db.models import Q
 from django.urls import reverse
 from .models import Post, Tag
@@ -116,3 +118,40 @@ def sitemap_xml(request):
             })
 
     return render(request, 'posts/sitemap.xml', {'entries': entries}, content_type='application/xml')
+
+
+@require_POST
+def set_language(request):
+    """
+    Minimal replacement for django.views.i18n.set_language.
+
+    We don't use i18n_patterns (no language prefix in URLs), so Django's
+    built-in view is unnecessary here and actively harmful: it calls
+    translate_url(), which runs resolve() on the full 'next' URL (including
+    the /blog prefix added by FORCE_SCRIPT_NAME) and then reverse()s it
+    again, adding /blog a second time and producing /blog/blog/... 404s.
+    This view just sets the language cookie and redirects, without that
+    URL-translation step.
+    """
+    next_url = request.POST.get('next') or request.META.get('HTTP_REFERER')
+    if not url_has_allowed_host_and_scheme(
+        url=next_url,
+        allowed_hosts={request.get_host()},
+        require_https=request.is_secure(),
+    ):
+        next_url = '/'
+
+    response = HttpResponseRedirect(next_url)
+    lang_code = request.POST.get('language')
+    if lang_code and check_for_language(lang_code):
+        response.set_cookie(
+            settings.LANGUAGE_COOKIE_NAME,
+            lang_code,
+            max_age=settings.LANGUAGE_COOKIE_AGE,
+            path=settings.LANGUAGE_COOKIE_PATH,
+            domain=settings.LANGUAGE_COOKIE_DOMAIN,
+            secure=settings.LANGUAGE_COOKIE_SECURE,
+            httponly=settings.LANGUAGE_COOKIE_HTTPONLY,
+            samesite=settings.LANGUAGE_COOKIE_SAMESITE,
+        )
+    return response
