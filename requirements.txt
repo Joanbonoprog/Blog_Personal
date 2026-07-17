@@ -4,3 +4,4 @@ psycopg2-binary
 python-dotenv
 django-tinymce
 whitenoise
+django-two-factor-auth>=1.17.0
