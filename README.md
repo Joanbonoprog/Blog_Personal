@@ -286,7 +286,7 @@ The Django admin is protected with TOTP via `django-two-factor-auth`.
 
 1. Deploy with `ADMIN_2FA_ENABLED=False`.
 2. Log in at `/blog/admin/` as the superuser.
-3. Go to `/blog/setup/` and scan the QR code with Google Authenticator, Authy, or similar.
+3. Go to `/blog/account/two_factor/setup/` and scan the QR code with Google Authenticator, Authy, or similar.
 4. Save the backup codes shown.
 5. Change `ADMIN_2FA_ENABLED=True` in Dokploy environment variables and redeploy.
 
