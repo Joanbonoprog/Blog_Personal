@@ -13,11 +13,11 @@ fi
 # Run migrations
 python manage.py migrate --noinput
 
-# Create superuser if credentials provided
-if [ -n "$DJANGO_SUPERUSER_USERNAME" ] && [ -n "$DJANGO_SUPERUSER_PASSWORD" ]; then
-    python manage.py createsuperuser --noinput \
-        --username $DJANGO_SUPERUSER_USERNAME \
-        --email $DJANGO_SUPERUSER_EMAIL || true
+# Create superuser if credentials provided. Django's --noinput reads the
+# username, email and password from the DJANGO_SUPERUSER_* env vars.
+if [ -n "$DJANGO_SUPERUSER_USERNAME" ] && [ -n "$DJANGO_SUPERUSER_EMAIL" ] && [ -n "$DJANGO_SUPERUSER_PASSWORD" ]; then
+    echo "Creating superuser $DJANGO_SUPERUSER_USERNAME..."
+    python manage.py createsuperuser --noinput || true
 fi
 
 # Start Gunicorn
