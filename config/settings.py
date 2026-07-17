@@ -106,9 +106,10 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Two-factor authentication URLs. With FORCE_SCRIPT_NAME='/blog' these become
-# /blog/login/ and /blog/admin/ respectively in production.
-LOGIN_URL = '/login/'
+# Two-factor authentication URLs. two_factor:login resolves to
+# /blog/account/login/ in production and two_factor:setup to
+# /blog/account/two_factor/setup/.
+LOGIN_URL = 'two_factor:login'
 LOGIN_REDIRECT_URL = '/admin/'
 
 TINYMCE_DEFAULT_CONFIG = {
