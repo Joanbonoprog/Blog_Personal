@@ -76,14 +76,24 @@ def post_detail(request, slug):
 def recent_posts(request):
     lang = get_language()[:2]
     title_field = f'title_{lang}'
-    posts = Post.objects.filter(published=True).exclude(**{title_field: ''})[:3]
+    try:
+        limit = int(request.GET.get('limit', 3))
+    except (TypeError, ValueError):
+        limit = 3
+    limit = max(1, min(limit, 20))
+
+    posts = (Post.objects.filter(published=True)
+             .exclude(**{title_field: ''})
+             .prefetch_related('tags')
+             .order_by('-created_at')[:limit])
     data = [
         {
             'title': p.get_title(lang),
             'slug': p.slug,
             'excerpt': p.get_excerpt(lang),
             'created_at': p.created_at.strftime('%Y-%m-%d'),
-            'url': f'/blog/{p.slug}/'
+            'url': f'/blog/{p.slug}/',
+            'tags': [{'name': t.name, 'slug': t.slug, 'color': t.color} for t in p.tags.all()],
         }
         for p in posts
     ]
