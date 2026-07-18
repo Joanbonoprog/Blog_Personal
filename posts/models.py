@@ -1,11 +1,23 @@
 from django.db import models
 from django.utils.text import slugify
+from django.utils.translation import get_language
+
+
+class TagQuerySet(models.QuerySet):
+    def with_published_in(self, lang):
+        """Tags that have at least one published post in the given language."""
+        return self.filter(
+            posts__published=True,
+            **{f'posts__title_{lang}__gt': ''},
+        ).distinct()
 
 
 class Tag(models.Model):
     name = models.CharField(max_length=50, unique=True)
     slug = models.SlugField(unique=True)
     color = models.CharField(max_length=7, default='#6366f1', help_text='Color hex, e.g. #6366f1')
+
+    objects = TagQuerySet.as_manager()
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -17,6 +29,36 @@ class Tag(models.Model):
 
     class Meta:
         ordering = ['name']
+
+
+class PostQuerySet(models.QuerySet):
+    def published(self):
+        return self.filter(published=True)
+
+    def with_language(self, lang):
+        """Posts whose title exists for the given language."""
+        return self.exclude(**{f'title_{lang}': ''})
+
+    def published_in(self, lang):
+        return self.published().with_language(lang)
+
+    def years_desc(self, lang):
+        return self.published_in(lang).dates('created_at', 'year', order='DESC')
+
+    def months_for_year(self, lang, year):
+        return (self.published_in(lang)
+                .filter(created_at__year=year)
+                .dates('created_at', 'month', order='ASC'))
+
+    def ordered(self, lang, order='newest'):
+        title_field = f'title_{lang}'
+        if order == 'oldest':
+            return self.order_by('created_at')
+        if order == 'az':
+            return self.order_by(title_field)
+        if order == 'za':
+            return self.order_by(f'-{title_field}')
+        return self.order_by('-created_at')
 
 
 class Post(models.Model):
@@ -35,21 +77,26 @@ class Post(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    def _active_lang(self, lang):
+    objects = PostQuerySet.as_manager()
+
+    @staticmethod
+    def _active_lang(lang=None):
         if lang is None:
-            from django.utils.translation import get_language
             active = get_language()
             return active[:2] if active else 'es'
         return lang
 
+    def _field_value(self, field, lang):
+        return getattr(self, f'{field}_{self._active_lang(lang)}', '')
+
     def get_title(self, lang=None):
-        return getattr(self, f'title_{self._active_lang(lang)}', '')
+        return self._field_value('title', lang)
 
     def get_excerpt(self, lang=None):
-        return getattr(self, f'excerpt_{self._active_lang(lang)}', '')
+        return self._field_value('excerpt', lang)
 
     def get_content(self, lang=None):
-        return getattr(self, f'content_{self._active_lang(lang)}', '')
+        return self._field_value('content', lang)
 
     def is_available_in(self, lang):
         return bool(getattr(self, f'title_{lang}', ''))

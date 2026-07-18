@@ -97,8 +97,9 @@ header .site-title:hover .blog-badge {
 .posts-toolbar {
     display: flex;
     align-items: flex-end;
-    justify-content: flex-end;
-    gap: 1rem;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 2.5rem;
     margin-bottom: 1.75rem;
 }
 
@@ -106,6 +107,18 @@ header .site-title:hover .blog-badge {
     display: flex;
     flex-direction: column;
     gap: 0.3rem;
+}
+
+.toolbar-control__row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.toolbar-control input,
+.toolbar-control select {
+    width: 100%;
+    margin-bottom: 0;
 }
 
 .toolbar-label {
@@ -397,6 +410,27 @@ header .site-title:hover .blog-badge {
 
 .back-link:hover {
     color: var(--pico-primary);
+}
+
+.copy-link-btn {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.75rem;
+    border-radius: 999px;
+    border: 1px solid var(--pico-muted-border-color) !important;
+    background: transparent !important;
+    color: var(--pico-color) !important;
+    cursor: pointer;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: border-color 0.15s;
+    box-shadow: none !important;
+}
+
+.copy-link-btn:hover {
+    border-color: var(--pico-primary) !important;
 }
 
 .post-detail-header h1 {

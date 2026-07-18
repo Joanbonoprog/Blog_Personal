@@ -1,22 +1,19 @@
 from django.contrib.syndication.views import Feed
 from django.urls import reverse
-from django.utils.translation import get_language
+from django.utils.translation import get_language, gettext_lazy as _
 from .models import Post
 
 
 class LatestPostsFeed(Feed):
     title = "Joan Bono - Blog"
-    description = "Últimas publicaciones del blog de Joan Bono"
+    description = _("Últimas publicaciones del blog de Joan Bono")
 
     def link(self):
         return reverse('post_list')
 
     def items(self):
         lang = get_language()[:2] if get_language() else 'es'
-        title_field = f'title_{lang}'
-        return (Post.objects.filter(published=True)
-                .exclude(**{title_field: ''})
-                .order_by('-created_at')[:20])
+        return Post.objects.published_in(lang).order_by('-created_at')[:20]
 
     def item_title(self, item):
         return item.get_title()
