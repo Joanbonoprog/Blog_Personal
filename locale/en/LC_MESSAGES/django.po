@@ -118,3 +118,6 @@ msgstr "As a last resort, you can use a backup token:"
 
 msgid "Usar código de respaldo"
 msgstr "Use Backup Token"
+
+msgid "Últimas publicaciones del blog de Joan Bono"
+msgstr "Latest posts from the blog of Joan Bono"
