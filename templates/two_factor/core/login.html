@@ -1,0 +1,60 @@
+{% extends "two_factor/_base_focus.html" %}
+{% load i18n %}
+{% load two_factor_tags %}
+
+{% block extra_media %}
+  {{ form.media }}
+{% endblock %}
+
+{% block content %}
+  <h1>{% trans "Iniciar sesión" %}</h1>
+
+  {% if wizard.steps.current == 'auth' %}
+    <p>{% trans "Introduzca sus credenciales." %}</p>
+  {% elif wizard.steps.current == 'token' %}
+    <p>{{ device|as_verbose_action }}</p>
+  {% elif wizard.steps.current == 'backup' %}
+    <p>{% trans "Use este formulario para introducir códigos de respaldo. Estos códigos se generaron para que los imprima y guarde de forma segura. Introduzca uno de estos códigos de respaldo para acceder a su cuenta." %}</p>
+  {% endif %}
+
+  <form action="" method="post">
+    {% block main_form_content %}
+    {% csrf_token %}
+    {% include "two_factor/_wizard_forms.html" %}
+
+    {# hidden submit button to enable [enter] key #}
+    <input type="submit" value="" hidden />
+
+    {% if other_devices %}
+      <p>{% trans "O, alternativamente, utilice uno de sus otros métodos de autenticación:" %}</p>
+      <p>
+        {% for other in other_devices %}
+        <button name="challenge_device" value="{{ other.persistent_id }}"
+                class="btn btn-secondary btn-block" type="submit">
+          {{ other|as_action }}
+        </button>
+      {% endfor %}</p>
+    {% endif %}
+
+    {% include "two_factor/_wizard_actions.html" %}
+    {% endblock %}
+  </form>
+
+  {% block 'backup_tokens' %}
+    {% if backup_tokens %}
+       <hr>
+       <div class="backup_tokens_form">
+       <form action="" method="post">
+           {% csrf_token %}
+            <p>{% trans "Como último recurso, puede usar un código de respaldo:" %}</p>
+            <p>
+                <button name="wizard_goto_step" type="submit" value="backup"
+                    class="btn btn-sm btn-secondary btn-block">
+                  {% trans "Usar código de respaldo" %}
+                </button>
+            </p>
+       </form>
+       </div>
+    {% endif %}
+  {% endblock %}
+{% endblock %}
