@@ -278,6 +278,7 @@ docker-compose -f docker-compose.prod.yml exec web bash
 | `CSRF verification failed` on login | `CSRF_TRUSTED_ORIGINS` missing the `https://` scheme or the exact domain |
 | Uploaded images disappear after redeploy | `media` volume not mounted or Dokploy recreated volumes |
 | 400 Bad Request | Domain missing from `ALLOWED_HOSTS` |
+| 500 error, PostgreSQL log shows `relation "django_otp_staticdevice" does not exist` | `django_otp` migrations not applied; run `docker-compose -f docker-compose.prod.yml exec web python manage.py migrate` or redeploy with the latest `entrypoint.sh` |
 
 ## Database
 
