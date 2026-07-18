@@ -1,10 +1,17 @@
 #!/bin/sh
 set -e
 
+# If a command is passed (e.g. docker-compose run web python manage.py migrate),
+# run it directly instead of the default startup flow.
+if [ $# -gt 0 ]; then
+    exec "$@"
+fi
+
 # Wait for PostgreSQL to be ready
+DB_PORT=${DB_PORT:-5432}
 if [ -n "$DB_HOST" ] && [ "$DB_HOST" != "localhost" ]; then
     echo "Waiting for PostgreSQL at $DB_HOST:$DB_PORT..."
-    while ! nc -z $DB_HOST $DB_PORT; do
+    while ! nc -z "$DB_HOST" "$DB_PORT"; do
         sleep 0.1
     done
     echo "PostgreSQL is ready"
