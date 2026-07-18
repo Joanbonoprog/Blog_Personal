@@ -6,7 +6,7 @@
     <title>{% block title %}Blog – Joan Bono{% endblock %}</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
     {% load static %}
-    <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+    <link rel="stylesheet" href="{% static 'css/theme.css' %}?v=3">
     <link rel="alternate" type="application/rss+xml" title="Joan Bono - Blog RSS" href="{% url 'rss_feed' %}">
 </head>
 <body>
@@ -15,7 +15,7 @@
         <div class="container">
             <nav>
                 <ul>
-                    <li><span class="site-title">Joan Bono <span class="blog-badge">Blog</span></span></li>
+                    <li><a href="{% url 'post_list' %}" class="site-title">Joan Bono <span class="blog-badge">Blog</span></a></li>
                 </ul>
                 <ul>
                     <li>
@@ -29,7 +29,7 @@
                         </form>
                     </li>
                     <li>
-                        <span class="theme-toggle" id="themeToggle" aria-label="Cambiar tema" style="display:inline-flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:999px;border:1px solid var(--pico-muted-border-color);background:transparent;cursor:pointer;">
+                        <span class="theme-toggle" id="themeToggle" aria-label="{% trans 'Cambiar tema' %}" style="display:inline-flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:999px;border:1px solid var(--pico-muted-border-color);background:transparent;cursor:pointer;">
                             <svg id="iconSun" xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
                                 <circle cx="12" cy="12" r="4"/>
                                 <line x1="12" y1="2" x2="12" y2="5"/>
@@ -55,6 +55,7 @@
         {% block content %}{% endblock %}
     </main>
 
+    {% block footer %}
     <footer class="site-footer">
         <div class="container">
             <p class="footer-built-label">{% trans "Construido con" %}</p>
@@ -93,6 +94,7 @@
             <small>© 2026 Joan Bono · <a href="https://joanbonoprog.es" target="_blank">Portfolio</a> · <a href="{% url 'rss_feed' %}" target="_blank">RSS</a></small>
         </div>
     </footer>
+    {% endblock %}
 
     <script>
         (function () {
@@ -100,10 +102,19 @@
             const btn = document.getElementById('themeToggle');
             const iconSun = document.getElementById('iconSun');
             const iconMoon = document.getElementById('iconMoon');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+            function resolveTheme(theme) {
+                if (theme === 'auto' || !theme) {
+                    return prefersDark ? 'dark' : 'light';
+                }
+                return theme;
+            }
 
             function applyTheme(theme) {
-                html.setAttribute('data-theme', theme);
-                if (theme === 'dark') {
+                const resolved = resolveTheme(theme);
+                html.setAttribute('data-theme', resolved);
+                if (resolved === 'dark') {
                     iconSun.style.display = 'block';
                     iconMoon.style.display = 'none';
                 } else {
@@ -113,11 +124,10 @@
             }
 
             const saved = localStorage.getItem('theme');
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
             applyTheme(saved || (prefersDark ? 'dark' : 'light'));
 
             btn.addEventListener('click', function () {
-                const current = html.getAttribute('data-theme');
+                const current = resolveTheme(html.getAttribute('data-theme'));
                 const next = current === 'dark' ? 'light' : 'dark';
                 applyTheme(next);
                 localStorage.setItem('theme', next);

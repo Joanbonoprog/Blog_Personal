@@ -6,9 +6,9 @@
 {% block content %}
 <div class="post-detail">
     <header class="post-detail-header">
-        <a href="{% url 'post_list' %}" class="back-link">← Volver al blog</a>
+        <a href="{% url 'post_list' %}" class="back-link">{% trans "← Volver al blog" %}</a>
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
-            <h1 style="margin-bottom:0;">{{ post.get_title }}</h1>
+            <h1>{{ post.get_title }}</h1>
             <span id="copyLinkBtn" onclick="copyPostLink()" title="{% trans 'Copiar enlace' %}"
                 style="display:inline-flex !important;align-items:center;gap:0.4rem;padding:0.4rem 0.75rem;border-radius:999px;border:1px solid var(--pico-muted-border-color) !important;background:transparent !important;color:var(--pico-color) !important;cursor:pointer;font-size:0.85rem;white-space:nowrap;flex-shrink:0;transition:border-color 0.15s;box-shadow:none !important;"
                 onmouseenter="this.style.borderColor='var(--pico-primary)';"
@@ -41,6 +41,41 @@
         {{ post.get_content|safe }}
     </div>
 </div>
+
+{% if related_posts %}
+<section class="related-posts">
+    <h2>{% trans 'Artículos relacionados' %}</h2>
+    <div class="related-posts-list">
+        {% for related in related_posts %}
+        <a href="{% url 'post_detail' related.slug %}" class="related-post-card">
+            <span class="related-post-title">{{ related.get_title }}</span>
+            <span class="related-post-date">{{ related.created_at|date:"d M Y" }}</span>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+{% if prev_post or next_post %}
+<nav class="post-nav" aria-label="{% trans 'Navegación entre artículos' %}">
+    {% if prev_post %}
+    <a href="{% url 'post_detail' prev_post.slug %}" class="post-nav-link post-nav-prev">
+        <span class="post-nav-label">{% trans '← Anterior' %}</span>
+        <span class="post-nav-title">{{ prev_post.get_title }}</span>
+    </a>
+    {% else %}
+    <span class="post-nav-link post-nav-prev post-nav-disabled"></span>
+    {% endif %}
+    {% if next_post %}
+    <a href="{% url 'post_detail' next_post.slug %}" class="post-nav-link post-nav-next">
+        <span class="post-nav-label">{% trans 'Siguiente →' %}</span>
+        <span class="post-nav-title">{{ next_post.get_title }}</span>
+    </a>
+    {% else %}
+    <span class="post-nav-link post-nav-next post-nav-disabled"></span>
+    {% endif %}
+</nav>
+{% endif %}
 
 <script>
     function copyPostLink() {

@@ -1,0 +1,326 @@
+/* Coherent Django admin theme based on blog colors */
+
+html[data-theme="light"],
+html[data-theme="auto"] {
+    color-scheme: light;
+    --primary: #2563eb;
+    --secondary: #1d4ed8;
+    --accent: #f59e0b;
+    --primary-fg: #ffffff;
+
+    --body-fg: #1f2937;
+    --body-bg: #ffffff;
+    --body-quiet-color: #6b7280;
+    --body-medium-color: #4b5563;
+    --body-loud-color: #111827;
+
+    --header-color: #ffffff;
+    --header-bg: var(--primary);
+    --header-link-color: #ffffff;
+    --header-branding-color: #ffffff;
+
+    --breadcrumbs-fg: #1e40af;
+    --breadcrumbs-link-fg: #2563eb;
+    --breadcrumbs-bg: #eff6ff;
+
+    --link-fg: #2563eb;
+    --link-hover-color: #1d4ed8;
+    --link-selected-fg: #1e40af;
+
+    --hairline-color: #e5e7eb;
+    --border-color: #d1d5db;
+
+    --error-fg: #dc2626;
+
+    --message-success-bg: #dcfce7;
+    --message-success-icon: url(../img/icon-yes.svg);
+    --message-warning-bg: #fef3c7;
+    --message-warning-icon: url(../img/icon-alert.svg);
+    --message-error-bg: #fee2e2;
+    --message-error-icon: url(../img/icon-no.svg);
+    --message-info-bg: #dbeafe;
+    --message-info-icon: url(../img/icon-info.svg);
+    --message-debug-bg: #f3f4f6;
+    --message-debug-icon: url(../img/icon-debug.svg);
+
+    --darkened-bg: #f9fafb;
+    --selected-bg: #eff6ff;
+    --selected-row: #dbeafe;
+
+    --button-fg: #ffffff;
+    --button-bg: var(--primary);
+    --button-hover-bg: #1d4ed8;
+    --default-button-bg: #1d4ed8;
+    --default-button-hover-bg: #1e40af;
+    --close-button-bg: #6b7280;
+    --close-button-hover-bg: #4b5563;
+    --delete-button-bg: #ef4444;
+    --delete-button-hover-bg: #dc2626;
+
+    --object-tools-fg: #ffffff;
+    --object-tools-bg: #6b7280;
+    --object-tools-hover-bg: #4b5563;
+}
+
+html[data-theme="dark"] {
+    color-scheme: dark;
+    --primary: #60a5fa;
+    --secondary: #93c5fd;
+    --accent: #fbbf24;
+    --primary-fg: #111827;
+
+    --body-fg: #e2e8f0;
+    --body-bg: #111827;
+    --body-quiet-color: #94a3b8;
+    --body-medium-color: #cbd5e1;
+    --body-loud-color: #f8fafc;
+
+    --header-color: #111827;
+    --header-bg: #60a5fa;
+    --header-link-color: #111827;
+    --header-branding-color: #111827;
+
+    --breadcrumbs-fg: #bfdbfe;
+    --breadcrumbs-link-fg: #ffffff;
+    --breadcrumbs-bg: #1e3a8a;
+
+    --link-fg: #60a5fa;
+    --link-hover-color: #93c5fd;
+    --link-selected-fg: #3b82f6;
+
+    --hairline-color: #374151;
+    --border-color: #374151;
+
+    --error-fg: #f87171;
+
+    --message-success-bg: #14532d;
+    --message-success-icon: url(../img/icon-yes-dark.svg);
+    --message-warning-bg: #78350f;
+    --message-warning-icon: url(../img/icon-alert-dark.svg);
+    --message-error-bg: #7f1d1d;
+    --message-error-icon: url(../img/icon-no-dark.svg);
+    --message-info-bg: #1e3a8a;
+    --message-info-icon: url(../img/icon-info-dark.svg);
+    --message-debug-bg: #374151;
+    --message-debug-icon: url(../img/icon-debug-dark.svg);
+
+    --darkened-bg: #1f2937;
+    --selected-bg: #1e3a8a;
+    --selected-row: #1d4ed8;
+
+    --button-fg: #111827;
+    --button-bg: #60a5fa;
+    --button-hover-bg: #93c5fd;
+    --default-button-bg: #3b82f6;
+    --default-button-hover-bg: #60a5fa;
+    --close-button-bg: #4b5563;
+    --close-button-hover-bg: #6b7280;
+    --delete-button-bg: #f87171;
+    --delete-button-hover-bg: #ef4444;
+
+    --object-tools-fg: #111827;
+    --object-tools-bg: #4b5563;
+    --object-tools-hover-bg: #6b7280;
+}
+
+@media (prefers-color-scheme: dark) {
+    html[data-theme="auto"] {
+        color-scheme: dark;
+        --primary: #60a5fa;
+        --secondary: #93c5fd;
+        --accent: #fbbf24;
+        --primary-fg: #111827;
+
+        --body-fg: #e2e8f0;
+        --body-bg: #111827;
+        --body-quiet-color: #94a3b8;
+        --body-medium-color: #cbd5e1;
+        --body-loud-color: #f8fafc;
+
+        --header-color: #111827;
+        --header-bg: #60a5fa;
+        --header-link-color: #111827;
+        --header-branding-color: #111827;
+
+        --breadcrumbs-fg: #bfdbfe;
+        --breadcrumbs-link-fg: #ffffff;
+        --breadcrumbs-bg: #1e3a8a;
+
+        --link-fg: #60a5fa;
+        --link-hover-color: #93c5fd;
+        --link-selected-fg: #3b82f6;
+
+        --hairline-color: #374151;
+        --border-color: #374151;
+
+        --error-fg: #f87171;
+
+        --message-success-bg: #14532d;
+        --message-success-icon: url(../img/icon-yes-dark.svg);
+        --message-warning-bg: #78350f;
+        --message-warning-icon: url(../img/icon-alert-dark.svg);
+        --message-error-bg: #7f1d1d;
+        --message-error-icon: url(../img/icon-no-dark.svg);
+        --message-info-bg: #1e3a8a;
+        --message-info-icon: url(../img/icon-info-dark.svg);
+        --message-debug-bg: #374151;
+        --message-debug-icon: url(../img/icon-debug-dark.svg);
+
+        --darkened-bg: #1f2937;
+        --selected-bg: #1e3a8a;
+        --selected-row: #1d4ed8;
+
+        --button-fg: #111827;
+        --button-bg: #60a5fa;
+        --button-hover-bg: #93c5fd;
+        --default-button-bg: #3b82f6;
+        --default-button-hover-bg: #60a5fa;
+        --close-button-bg: #4b5563;
+        --close-button-hover-bg: #6b7280;
+        --delete-button-bg: #f87171;
+        --delete-button-hover-bg: #ef4444;
+
+        --object-tools-fg: #111827;
+        --object-tools-bg: #4b5563;
+        --object-tools-hover-bg: #6b7280;
+    }
+}
+
+#header {
+    background: var(--header-bg);
+    color: var(--header-color);
+}
+
+#header a:link,
+#header a:visited,
+#branding h1,
+#site-name a,
+#user-tools a,
+#logout-form button {
+    color: var(--header-link-color) !important;
+    background: transparent !important;
+    border: none !important;
+}
+
+div.breadcrumbs {
+    background: var(--breadcrumbs-bg);
+    color: var(--breadcrumbs-fg);
+}
+
+div.breadcrumbs a {
+    color: var(--breadcrumbs-link-fg);
+}
+
+a:link,
+a:visited {
+    color: var(--link-fg);
+}
+
+a:hover {
+    color: var(--link-hover-color);
+}
+
+/* Rounded containers */
+.module, fieldset, .inline-group, .aligned, .tabular,
+.dashboard, .change-list, #changelist, #content-related .module,
+.messagelist, .filtered .results, #changelist-form {
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    background: var(--body-bg);
+}
+
+.module {
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.module h2, .module caption, .inline-group h2 {
+    padding: 0.75rem 1rem;
+    margin: 0;
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: var(--header-bg);
+    color: var(--header-link-color);
+    border-bottom: 1px solid var(--border-color);
+}
+
+#content-related .module h2 {
+    background: var(--header-bg);
+    color: var(--header-link-color);
+}
+
+/* Inputs, buttons and selects */
+input, select, textarea, button, .button, .submit-row input,
+.object-tools a, .selector-filter, .selector-available h2 {
+    border-radius: 0.375rem !important;
+    border-color: var(--border-color);
+}
+
+input, select, textarea {
+    background: var(--body-bg);
+    color: var(--body-fg);
+}
+
+.button, input[type="submit"], input[type="button"], .submit-row input,
+.object-tools a {
+    background: var(--button-bg);
+    color: var(--button-fg);
+    border: none;
+    padding: 0.5rem 1rem;
+    box-shadow: none;
+}
+
+.button:hover, input[type="submit"]:hover, input[type="button"]:hover,
+.object-tools a:hover {
+    background: var(--button-hover-bg);
+    color: var(--button-fg);
+}
+
+.button.default, input[type="submit"].default {
+    background: var(--default-button-bg);
+}
+
+.button.default:hover, input[type="submit"].default:hover {
+    background: var(--default-button-hover-bg);
+}
+
+/* Tables */
+table {
+    border-collapse: collapse;
+    width: 100%;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+thead th {
+    background: var(--darkened-bg);
+    color: var(--body-fg);
+    font-weight: 600;
+}
+
+tbody tr:nth-child(odd) {
+    background: var(--body-bg);
+}
+
+tbody tr:nth-child(even) {
+    background: var(--darkened-bg);
+}
+
+tbody tr:hover {
+    background: var(--selected-bg);
+}
+
+/* Messages */
+ul.messagelist li {
+    border-radius: 0.375rem;
+}
+
+/* Theme toggle icon colors */
+.theme-toggle svg.theme-icon-when-auto,
+.theme-toggle svg.theme-icon-when-dark,
+.theme-toggle svg.theme-icon-when-light {
+    fill: var(--header-link-color);
+    color: var(--header-bg);
+}
