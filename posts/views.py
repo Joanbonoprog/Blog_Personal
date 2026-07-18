@@ -8,48 +8,43 @@ from django.core.paginator import Paginator
 from django.db.models import Q, Count
 from django.urls import reverse
 from .models import Post, Tag
+from .forms import PostFilterForm
+
+
+PAGINATION_COOKIE_NAME = 'posts_per_page'
+PAGINATION_ALLOWED_SIZES = {5, 10, 15, 20, 25}
+PAGINATION_DEFAULT_SIZE = 15
+
+
+def _get_posts_per_page(request):
+    """Read the posts-per-page cookie, falling back to the default."""
+    try:
+        per_page = int(request.COOKIES.get(PAGINATION_COOKIE_NAME, PAGINATION_DEFAULT_SIZE))
+    except (TypeError, ValueError):
+        per_page = PAGINATION_DEFAULT_SIZE
+    return per_page if per_page in PAGINATION_ALLOWED_SIZES else PAGINATION_DEFAULT_SIZE
 
 
 def post_list(request):
     lang = get_language()[:2]
-    title_field = f'title_{lang}'
 
-    posts = Post.objects.filter(published=True).exclude(**{title_field: ''})
-    all_tags = Tag.objects.filter(posts__published=True, **{f'posts__title_{lang}__gt': ''}).distinct()
-
-    tag_slug = request.GET.get('tag') or None
-    order = request.GET.get('order', 'newest')
+    all_tags = Tag.objects.with_published_in(lang)
+    all_years = Post.objects.years_desc(lang)
     year = request.GET.get('year') or None
-    month = request.GET.get('month') or None
-    query = (request.GET.get('q') or '').strip()
+    all_months = Post.objects.months_for_year(lang, year) if year else None
 
-    if tag_slug:
-        posts = posts.filter(tags__slug=tag_slug)
-    if year:
-        posts = posts.filter(created_at__year=year)
-    if month:
-        posts = posts.filter(created_at__month=month)
-    if query:
-        posts = posts.filter(Q(**{f'{title_field}__icontains': query}) | Q(slug__icontains=query))
+    form = PostFilterForm(
+        data=request.GET or None,
+        lang=lang,
+        all_tags=all_tags,
+        all_years=all_years,
+        all_months=all_months,
+    )
 
-    if order == 'oldest':
-        posts = posts.order_by('created_at')
-    elif order == 'az':
-        posts = posts.order_by(title_field)
-    elif order == 'za':
-        posts = posts.order_by(f'-{title_field}')
-    else:
-        posts = posts.order_by('-created_at')
+    posts = Post.objects.published_in(lang)
+    posts = form.filter_queryset(posts)
 
-    # Responsive page size: 5 rows per breakpoint (cookie set by JS from viewport width)
-    try:
-        per_page = int(request.COOKIES.get('posts_per_page', 15))
-    except (TypeError, ValueError):
-        per_page = 15
-    allowed_per_page = {5, 10, 15, 20, 25}
-    if per_page not in allowed_per_page:
-        per_page = 15
-
+    per_page = _get_posts_per_page(request)
     paginator = Paginator(posts, per_page)
     page_obj = paginator.get_page(request.GET.get('page'))
 
@@ -57,16 +52,7 @@ def post_list(request):
     get_params.pop('page', None)
     query_params_without_page = get_params.urlencode()
 
-    all_years = (Post.objects.filter(published=True)
-                 .exclude(**{title_field: ''})
-                 .dates('created_at', 'year', order='DESC'))
-
-    all_months = None
-    if year:
-        all_months = (Post.objects.filter(published=True, created_at__year=year)
-                      .exclude(**{title_field: ''})
-                      .dates('created_at', 'month', order='ASC'))
-
+    cleaned = form.cleaned_data if form.is_valid() else {}
     return render(request, 'posts/list.html', {
         'posts': page_obj,
         'page_obj': page_obj,
@@ -74,25 +60,24 @@ def post_list(request):
         'per_page': per_page,
         'query_params_without_page': query_params_without_page,
         'all_tags': all_tags,
-        'active_tag': tag_slug,
-        'order': order,
+        'active_tag': cleaned.get('tag') or None,
+        'order': cleaned.get('order') or 'newest',
         'lang': lang,
         'all_years': all_years,
         'all_months': all_months,
-        'active_year': year,
-        'active_month': month,
-        'query': query,
+        'active_year': cleaned.get('year') or None,
+        'active_month': cleaned.get('month') or None,
+        'query': cleaned.get('q', ''),
     })
 
 
 def post_detail(request, slug):
     lang = get_language()[:2]
-    title_field = f'title_{lang}'
     post = get_object_or_404(Post, slug=slug, published=True)
     if not post.is_available_in(lang):
         raise Http404
 
-    base_qs = Post.objects.filter(published=True).exclude(**{title_field: ''})
+    base_qs = Post.objects.published_in(lang)
 
     # Related posts: share tags with current post, ordered by most shared tags, then most recent.
     post_tag_ids = list(post.tags.values_list('id', flat=True))
@@ -123,15 +108,13 @@ def post_detail(request, slug):
 @require_GET
 def recent_posts(request):
     lang = get_language()[:2]
-    title_field = f'title_{lang}'
     try:
         limit = int(request.GET.get('limit', 3))
     except (TypeError, ValueError):
         limit = 3
     limit = max(1, min(limit, 20))
 
-    posts = (Post.objects.filter(published=True)
-             .exclude(**{title_field: ''})
+    posts = (Post.objects.published_in(lang)
              .prefetch_related('tags')
              .order_by('-created_at')[:limit])
     data = [
@@ -140,7 +123,7 @@ def recent_posts(request):
             'slug': p.slug,
             'excerpt': p.get_excerpt(lang),
             'created_at': p.created_at.strftime('%Y-%m-%d'),
-            'url': f'/blog/{p.slug}/',
+            'url': request.build_absolute_uri(reverse('post_detail', args=[p.slug])),
             'tags': [{'name': t.name, 'slug': t.slug, 'color': t.color} for t in p.tags.all()],
         }
         for p in posts
@@ -162,10 +145,7 @@ def robots_txt(request):
 def llms_txt(request):
     """llms.txt: public content available to AI crawlers, with post list."""
     lang = get_language()[:2]
-    title_field = f'title_{lang}'
-    posts = (Post.objects.filter(published=True)
-             .exclude(**{title_field: ''})
-             .order_by('-created_at'))
+    posts = Post.objects.published_in(lang).order_by('-created_at')
 
     site = request.build_absolute_uri('/')
     sitemap_url = request.build_absolute_uri(reverse('sitemap'))
@@ -203,10 +183,7 @@ def sitemap_xml(request):
 
     seen_slugs = set()
     for lang in languages:
-        title_field = f'title_{lang}'
-        posts = (Post.objects.filter(published=True)
-                 .exclude(**{title_field: ''})
-                 .order_by('-updated_at'))
+        posts = Post.objects.published_in(lang).order_by('-updated_at')
         for post in posts:
             if post.slug in seen_slugs:
                 continue
