@@ -28,7 +28,7 @@
                 {% endfor %}
             </select>
             {% if active_tag %}
-            <span onclick="const p=new URLSearchParams(window.location.search);p.delete('tag');window.location.search=p.toString()" class="toolbar-reset" title="Quitar filtro"
+            <span onclick="const p=new URLSearchParams(window.location.search);p.delete('tag');window.location.search=p.toString()" class="toolbar-reset" title="{% trans 'Quitar filtro' %}"
                 style="display:inline-flex;align-items:center;justify-content:center;width:46px;height:46px;border-radius:6px;border:1px solid var(--pico-muted-border-color);background:transparent;color:var(--pico-muted-color);font-size:1rem;cursor:pointer;flex-shrink:0;"
                 onmouseenter="this.style.border='1px solid #ef4444';this.style.color='#ef4444';this.style.background='rgba(239,68,68,0.08)';"
                 onmouseleave="this.style.border='1px solid var(--pico-muted-border-color)';this.style.color='var(--pico-muted-color)';this.style.background='transparent';">✕</span>
@@ -45,7 +45,7 @@
                 {% endfor %}
             </select>
             {% if active_year %}
-            <span onclick="const p=new URLSearchParams(window.location.search);p.delete('year');p.delete('month');window.location.search=p.toString()" class="toolbar-reset" title="Quitar año"
+            <span onclick="const p=new URLSearchParams(window.location.search);p.delete('year');p.delete('month');window.location.search=p.toString()" class="toolbar-reset" title="{% trans 'Quitar año' %}"
                 style="display:inline-flex;align-items:center;justify-content:center;width:46px;height:46px;border-radius:6px;border:1px solid var(--pico-muted-border-color);background:transparent;color:var(--pico-muted-color);font-size:1rem;cursor:pointer;flex-shrink:0;"
                 onmouseenter="this.style.border='1px solid #ef4444';this.style.color='#ef4444';this.style.background='rgba(239,68,68,0.08)';"
                 onmouseleave="this.style.border='1px solid var(--pico-muted-border-color)';this.style.color='var(--pico-muted-color)';this.style.background='transparent';">✕</span>
@@ -63,7 +63,7 @@
                 {% endfor %}
             </select>
             {% if active_month %}
-            <span onclick="const p=new URLSearchParams(window.location.search);p.delete('month');window.location.search=p.toString()" class="toolbar-reset" title="Quitar mes"
+            <span onclick="const p=new URLSearchParams(window.location.search);p.delete('month');window.location.search=p.toString()" class="toolbar-reset" title="{% trans 'Quitar mes' %}"
                 style="display:inline-flex;align-items:center;justify-content:center;width:46px;height:46px;border-radius:6px;border:1px solid var(--pico-muted-border-color);background:transparent;color:var(--pico-muted-color);font-size:1rem;cursor:pointer;flex-shrink:0;"
                 onmouseenter="this.style.border='1px solid #ef4444';this.style.color='#ef4444';this.style.background='rgba(239,68,68,0.08)';"
                 onmouseleave="this.style.border='1px solid var(--pico-muted-border-color)';this.style.color='var(--pico-muted-color)';this.style.background='transparent';">✕</span>
@@ -81,7 +81,7 @@
                 <option value="za" {% if order == 'za' %}selected{% endif %}>Z → A</option>
             </select>
             {% if order != 'newest' %}
-            <span onclick="const p=new URLSearchParams(window.location.search);p.delete('order');window.location.search=p.toString()" class="toolbar-reset" title="Restablecer orden"
+            <span onclick="const p=new URLSearchParams(window.location.search);p.delete('order');window.location.search=p.toString()" class="toolbar-reset" title="{% trans 'Restablecer orden' %}"
                 style="display:inline-flex;align-items:center;justify-content:center;width:46px;height:46px;border-radius:6px;border:1px solid var(--pico-muted-border-color);background:transparent;color:var(--pico-muted-color);font-size:1rem;cursor:pointer;flex-shrink:0;"
                 onmouseenter="this.style.border='1px solid #ef4444';this.style.color='#ef4444';this.style.background='rgba(239,68,68,0.08)';"
                 onmouseleave="this.style.border='1px solid var(--pico-muted-border-color)';this.style.color='var(--pico-muted-color)';this.style.background='transparent';">✕</span>
@@ -114,9 +114,64 @@
         </a>
         {% endfor %}
     </div>
+
+    {% if page_obj.has_other_pages %}
+    <nav aria-label="{% trans 'Paginación' %}">
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+            <a class="pagination-prev" href="?{{ query_params_without_page }}{% if query_params_without_page %}&amp;{% endif %}page={{ page_obj.previous_page_number }}">{% trans "Anterior" %}</a>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if num == page_obj.number %}
+                <span class="pagination-current">{{ num }}</span>
+                {% else %}
+                <a class="pagination-link" href="?{{ query_params_without_page }}{% if query_params_without_page %}&amp;{% endif %}page={{ num }}">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <a class="pagination-next" href="?{{ query_params_without_page }}{% if query_params_without_page %}&amp;{% endif %}page={{ page_obj.next_page_number }}">{% trans "Siguiente" %}</a>
+            {% endif %}
+        </div>
+    </nav>
+    {% endif %}
 {% else %}
     <div class="empty-state">
         <p>{% if query %}{% trans "No se encontraron posts para" %} "{{ query }}".{% else %}{% trans "No hay posts todavía." %}{% endif %}</p>
     </div>
 {% endif %}
+
+<script>
+function getDesiredPerPage() {
+    var w = window.innerWidth;
+    if (w < 768) return 5;
+    if (w < 992) return 10;
+    if (w < 1400) return 15;
+    if (w < 1921) return 20;
+    return 25;
+}
+
+function applyDesiredPerPage() {
+    var desired = getDesiredPerPage();
+    var current = {{ per_page|default:15 }};
+    if (String(current) === String(desired)) return;
+
+    var expiry = new Date();
+    expiry.setFullYear(expiry.getFullYear() + 1);
+    document.cookie = 'posts_per_page=' + desired + '; path=/; expires=' + expiry.toUTCString() + '; SameSite=Lax';
+
+    var url = new URL(window.location.href);
+    url.searchParams.delete('page');
+    window.location.replace(url.toString());
+}
+
+document.addEventListener('DOMContentLoaded', applyDesiredPerPage);
+
+var resizeTimer;
+window.addEventListener('resize', function() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(applyDesiredPerPage, 300);
+});
+</script>
 {% endblock %}
