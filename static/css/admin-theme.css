@@ -33,15 +33,15 @@ html[data-theme="auto"] {
     --error-fg: #dc2626;
 
     --message-success-bg: #dcfce7;
-    --message-success-icon: url(../img/icon-yes.svg);
+    --message-success-icon: none;
     --message-warning-bg: #fef3c7;
-    --message-warning-icon: url(../img/icon-alert.svg);
+    --message-warning-icon: none;
     --message-error-bg: #fee2e2;
-    --message-error-icon: url(../img/icon-no.svg);
+    --message-error-icon: none;
     --message-info-bg: #dbeafe;
-    --message-info-icon: url(../img/icon-info.svg);
+    --message-info-icon: none;
     --message-debug-bg: #f3f4f6;
-    --message-debug-icon: url(../img/icon-debug.svg);
+    --message-debug-icon: none;
 
     --darkened-bg: #f9fafb;
     --selected-bg: #eff6ff;
@@ -94,15 +94,15 @@ html[data-theme="dark"] {
     --error-fg: #f87171;
 
     --message-success-bg: #14532d;
-    --message-success-icon: url(../img/icon-yes-dark.svg);
+    --message-success-icon: none;
     --message-warning-bg: #78350f;
-    --message-warning-icon: url(../img/icon-alert-dark.svg);
+    --message-warning-icon: none;
     --message-error-bg: #7f1d1d;
-    --message-error-icon: url(../img/icon-no-dark.svg);
+    --message-error-icon: none;
     --message-info-bg: #1e3a8a;
-    --message-info-icon: url(../img/icon-info-dark.svg);
+    --message-info-icon: none;
     --message-debug-bg: #374151;
-    --message-debug-icon: url(../img/icon-debug-dark.svg);
+    --message-debug-icon: none;
 
     --darkened-bg: #1f2937;
     --selected-bg: #1e3a8a;
@@ -156,15 +156,15 @@ html[data-theme="dark"] {
         --error-fg: #f87171;
 
         --message-success-bg: #14532d;
-        --message-success-icon: url(../img/icon-yes-dark.svg);
+        --message-success-icon: none;
         --message-warning-bg: #78350f;
-        --message-warning-icon: url(../img/icon-alert-dark.svg);
+        --message-warning-icon: none;
         --message-error-bg: #7f1d1d;
-        --message-error-icon: url(../img/icon-no-dark.svg);
+        --message-error-icon: none;
         --message-info-bg: #1e3a8a;
-        --message-info-icon: url(../img/icon-info-dark.svg);
+        --message-info-icon: none;
         --message-debug-bg: #374151;
-        --message-debug-icon: url(../img/icon-debug-dark.svg);
+        --message-debug-icon: none;
 
         --darkened-bg: #1f2937;
         --selected-bg: #1e3a8a;
