@@ -10,8 +10,9 @@ if [ -n "$DB_HOST" ] && [ "$DB_HOST" != "localhost" ]; then
     echo "PostgreSQL is ready"
 fi
 
-# Run migrations
+# Run migrations (explicit django_otp/two_factor apps to avoid ordering issues)
 python manage.py migrate --noinput
+python manage.py migrate --noinput otp_static otp_totp two_factor
 
 # Create superuser if credentials provided. Django's --noinput reads the
 # username, email and password from the DJANGO_SUPERUSER_* env vars.
