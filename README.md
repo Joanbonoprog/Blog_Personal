@@ -4,7 +4,7 @@ Personal blog built with Django. Deployed at `joanbonoprog.es/blog`.
 
 ## Stack
 
-- Python 3.12 + Django 5.0+
+- Python 3.12 + Django 6.0+
 - PostgreSQL (production) / SQLite (local)
 - Pico CSS (minimalist styling)
 - Gunicorn (WSGI server)
@@ -25,7 +25,9 @@ Personal blog built with Django. Deployed at `joanbonoprog.es/blog`.
 - ✅ RSS feed (`/rss.xml`)
 - ✅ Copy-link button on post pages
 - ✅ JSON API for portfolio integration
-- ✅ 60+ automated tests (models, views, feeds, sitemap, API, admin)
+- ✅ Responsive, viewport-aware pagination
+- ✅ Clean-code / SOLID refactor (custom querysets, filter form, external JS/CSS)
+- ✅ 68+ automated tests (models, views, feeds, sitemap, API, admin, i18n)
 
 ## Requirements
 
@@ -93,13 +95,16 @@ CSRF_TRUSTED_ORIGINS=https://joanbonoprog.es,https://www.joanbonoprog.es
 blog/
 ├── config/                    # Settings, URLs, WSGI
 ├── posts/                     # Main app
-│   ├── models.py              # Post, Tag
+│   ├── models.py              # Post, Tag + custom querysets/managers
 │   ├── views.py               # List, detail, search, sitemap, API
+│   ├── forms.py               # PostFilterForm (search/filters/ordering)
 │   ├── feeds.py                # RSS feed
 │   ├── admin.py               # Admin config + TinyMCE
 │   └── tests/                 # Test suite (60+ tests)
 ├── templates/                  # Django templates
 ├── static/                    # CSS, JS, images
+│   ├── css/theme.css          # Custom Pico CSS theme
+│   └── js/                    # External JS (theme, posts list, post detail)
 ├── locale/                    # Translations (ES/EN)
 ├── media/                      # User uploads
 ├── Dockerfile
@@ -110,6 +115,19 @@ blog/
 ├── requirements.txt
 └── manage.py
 ```
+
+## Architecture & clean code
+
+The codebase follows SOLID principles and clean-code practices:
+
+- **Custom querysets/managers** in `posts/models.py` (`PostQuerySet`, `TagQuerySet`) centralize the repeated "published + language" logic and date aggregations.
+- **`PostFilterForm`** in `posts/forms.py` encapsulates list filtering, ordering and search, keeping `post_list` focused on coordination.
+- **External JS modules** in `static/js/` replace inline scripts and event handlers in the templates:
+  - `theme.js` — light/dark mode
+  - `posts.js` — pagination, search, filters, sorting
+  - `post_detail.js` — copy-link button
+- **No hardcoded URLs** in views/feeds; `reverse` + `request.build_absolute_uri` are used.
+- **i18n-ready**: all user-facing strings are wrapped with `{% trans %}` and translated in `locale/en/LC_MESSAGES/django.po`.
 
 ## Endpoints
 
@@ -125,7 +143,7 @@ blog/
 
 ## Testing
 
-The project includes 60+ tests covering models, views, feeds, sitemap, the API and the admin.
+The project includes 68+ tests covering models, views, feeds, sitemap, the API, admin and i18n.
 
 ```bash
 # Run the full test suite
@@ -140,11 +158,12 @@ The project includes 60+ tests covering models, views, feeds, sitemap, the API a
 
 Test files live in `posts/tests/`:
 - `test_models.py` — `Post`/`Tag` model behavior (slugs, language fallback)
-- `test_views_list.py` — filtering, search, sorting on the post list
+- `test_views_list.py` — filtering, search, sorting and pagination on the post list
 - `test_views_detail.py` — 404 handling for unpublished/unavailable posts
 - `test_sitemap.py` — sitemap XML correctness
 - `test_feeds.py` — RSS feed correctness
 - `test_api.py` — `/api/recent/` JSON contract
+- `test_i18n.py` — language switcher and translation behavior
 - `test_admin.py` — admin configuration and TinyMCE integration
 
 ## Production deployment (Dokploy)
