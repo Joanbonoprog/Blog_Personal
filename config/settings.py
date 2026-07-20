@@ -1,4 +1,5 @@
 import os
+import sys
 from pathlib import Path
 from dotenv import load_dotenv
 from django.utils.translation import gettext_lazy as _
@@ -24,6 +25,7 @@ INSTALLED_APPS = [
     'django_otp.plugins.otp_totp',
     'django_otp.plugins.otp_static',
     'two_factor',
+    'axes',
     'posts',
     'tinymce',
 ]
@@ -38,6 +40,8 @@ MIDDLEWARE = [
     'django_otp.middleware.OTPMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # AxesMiddleware must be the last middleware (per django-axes docs).
+    'axes.middleware.AxesMiddleware',
 ]
 
 if os.getenv('DJANGO_ENV') == 'production':
@@ -112,6 +116,29 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # /blog/account/two_factor/setup/.
 LOGIN_URL = 'two_factor:login'
 LOGIN_REDIRECT_URL = '/admin/'
+
+# django-axes: lock out an IP/username after too many failed login attempts.
+# AxesStandaloneBackend must come first so it can short-circuit auth before
+# ModelBackend even checks the password.
+AUTHENTICATION_BACKENDS = [
+    'axes.backends.AxesStandaloneBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+# Django's test Client.login() calls authenticate() without a request
+# object, which AxesBackend requires; disable axes while running tests.
+AXES_ENABLED = 'test' not in sys.argv
+
+AXES_FAILURE_LIMIT = 5
+AXES_COOLOFF_TIME = 1  # hours
+AXES_LOCKOUT_PARAMETERS = ['ip_address', 'username']
+AXES_RESET_COOLOFF_ON_FAILURE_DURING_LOCKOUT = False
+
+# The app sits behind Traefik (Dokploy's reverse proxy), which adds exactly
+# one hop of X-Forwarded-For. Without this, axes/ipware would see Traefik's
+# internal IP for every request instead of the real client IP.
+AXES_IPWARE_PROXY_COUNT = 1
+AXES_IPWARE_META_PRECEDENCE_ORDER = ['HTTP_X_FORWARDED_FOR']
 
 TINYMCE_DEFAULT_CONFIG = {
     'height': 500,

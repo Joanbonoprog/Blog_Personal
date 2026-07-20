@@ -311,3 +311,41 @@ The Django admin is protected with TOTP via `django-two-factor-auth`.
 5. Change `ADMIN_2FA_ENABLED=True` in Dokploy environment variables and redeploy.
 
 From then on, any access to `/blog/admin/` requires password + TOTP token.
+
+## Admin IP allow-listing
+
+`django-axes` blocks brute-force login attempts, but you can also hide the admin path entirely from the public internet and only allow your own IP(s) to reach it.
+
+### Dokploy (Traefik) approach
+
+1. Open the `web` service in Dokploy and go to **Advanced > Middlewares**.
+2. Add a Traefik middleware:
+   - Type: `IPAllowList` (older Dokploy/UIs may call it `IPWhiteList`)
+   - Source range: your public IP in CIDR notation, e.g. `85.123.45.67/32`
+   - You can add more than one address separated by commas.
+3. Apply that middleware to the route/path matching `/blog/admin`.
+
+Dokploy generally exposes this as an additional middleware attached to the existing Traefik router for the service.
+
+### Docker Compose + Traefik labels (alternative)
+
+If you manage Traefik yourself instead of using Dokploy's automatic router, add labels to the `web` service in `docker-compose.prod.yml`:
+
+```yaml
+web:
+  build: .
+  labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.blog-admin.rule=PathPrefix(\`/blog/admin\`)"
+    - "traefik.http.routers.blog-admin.middlewares=admin-allowlist"
+    - "traefik.http.middlewares.admin-allowlist.ipallowlist.sourcerange=85.123.45.67/32"
+```
+
+Replace `85.123.45.67/32` with your public IP. If the blog runs under a different subpath, update `PathPrefix(\`/blog/admin\`)` accordingly.
+
+### Verify
+
+After redeploy:
+
+- From your allowed IP: `https://joanbonoprog.es/blog/admin/` loads normally.
+- From any other IP: Traefik returns `403 Forbidden` before Django even sees the request.
