@@ -31,8 +31,12 @@ if [ -n "$DJANGO_SUPERUSER_USERNAME" ] && [ -n "$DJANGO_SUPERUSER_EMAIL" ] && [ 
     python manage.py createsuperuser --noinput || true
 fi
 
-# Start Gunicorn
+# Start Gunicorn (explicit stdout logging so Dokploy captures worker tracebacks)
 exec gunicorn config.wsgi:application \
     --bind 0.0.0.0:8000 \
     --workers 2 \
-    --timeout 60
+    --timeout 60 \
+    --access-logfile - \
+    --error-logfile - \
+    --log-level debug \
+    --capture-output
