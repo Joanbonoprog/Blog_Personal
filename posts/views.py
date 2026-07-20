@@ -133,10 +133,12 @@ def recent_posts(request):
 
 @require_GET
 def robots_txt(request):
-    """robots.txt: allow all crawlers and point to the sitemap."""
+    """robots.txt: allow all crawlers except the Django admin, and point to
+    the sitemap."""
     sitemap_url = request.build_absolute_uri(reverse('sitemap'))
+    admin_path = reverse('admin:index')
     return HttpResponse(
-        f"User-agent: *\nAllow: /\n\nSitemap: {sitemap_url}\n",
+        f"User-agent: *\nAllow: /\nDisallow: {admin_path}\n\nSitemap: {sitemap_url}\n",
         content_type='text/plain',
     )
 
@@ -147,9 +149,10 @@ def llms_txt(request):
     lang = get_language()[:2]
     posts = Post.objects.published_in(lang).order_by('-created_at')
 
-    site = request.build_absolute_uri('/')
+    site = request.build_absolute_uri(reverse('post_list'))
     sitemap_url = request.build_absolute_uri(reverse('sitemap'))
     rss_url = request.build_absolute_uri(reverse('rss_feed'))
+    admin_path = reverse('admin:index')
 
     lines = [
         '# llms.txt',
@@ -161,6 +164,7 @@ def llms_txt(request):
         '',
         'User-agent: *',
         'Allow: /',
+        f'Disallow: {admin_path}',
         '',
         '# Posts',
     ]
