@@ -141,3 +141,29 @@ if os.getenv('DJANGO_ENV') == 'production':
 else:
     STATIC_URL = '/static/'
     MEDIA_URL = '/media/'
+
+# By default Django only sends 500-level errors to `mail_admins` (which is a
+# silent no-op without ADMINS/email configured) and does not propagate them
+# to the console. Force unhandled exceptions to stdout so they show up in
+# `docker logs` / Dokploy regardless of DEBUG.
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django.request': {
+            'handlers': ['console'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+}
