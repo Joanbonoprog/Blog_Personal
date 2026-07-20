@@ -21,7 +21,6 @@ services:
     build: .
     container_name: blog_web_prod
     volumes:
-      - staticfiles:/app/staticfiles
       - media:/app/media
     # Dokploy's own Traefik reverse proxy routes traffic to this container
     # on port 8000 and handles SSL. Do not publish 80/443 here.
@@ -46,5 +45,4 @@ services:
 
 volumes:
   postgres_data:
-  staticfiles:
   media:
