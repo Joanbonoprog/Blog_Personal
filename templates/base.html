@@ -6,6 +6,7 @@
     <title>{% block title %}Blog – Joan Bono{% endblock %}</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
     {% load static %}
+    <link rel="icon" type="image/svg+xml" href="{% static 'img/favicon.svg' %}">
     <link rel="stylesheet" href="{% static 'css/theme.css' %}?v=4">
     <link rel="alternate" type="application/rss+xml" title="Joan Bono - Blog RSS" href="{% url 'rss_feed' %}">
 </head>
