@@ -8,6 +8,7 @@ updates:
   #Python Dependencies: Django and other packages
   - package-ecosystem: "pip" # See documentation for possible values
     directory: "/" # Location of package manifests
+    target-branch: "develop"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5
@@ -15,6 +16,7 @@ updates:
     #Declared Docker images in Docker Compose
   - package-ecosystem: "docker-compose"
     directory: "/"
+    target-branch: "develop"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5
