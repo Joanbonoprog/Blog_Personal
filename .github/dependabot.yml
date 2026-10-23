@@ -15,6 +15,6 @@ updates:
     #Declared Docker images in Docker Compose
     - package-ecosystem: "docker-compose"
       directory: "/"
-      schedule: 
+      schedule:
         interval: "weekly"
       open-pull-requests-limit: 5
